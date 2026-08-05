@@ -46,13 +46,15 @@
                             </tr>
                         </template>
 
-                        <template x-if="!loading" x-for="row in rows" :key="row.id">
+                        <template x-if="!loading">
+                        <template x-for="row in rows" :key="row.id">
                             <tr class="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
                                 <td class="px-4 py-3.5 font-medium text-slate-700 dark:text-slate-200" x-text="row.user_name"></td>
                                 <td class="px-4 py-3.5 text-slate-500 dark:text-slate-400" x-text="row.action"></td>
                                 <td class="px-4 py-3.5 text-slate-500 dark:text-slate-400" x-text="row.description"></td>
                                 <td class="px-4 py-3.5 text-slate-500 dark:text-slate-400" x-text="row.created_at_label"></td>
                             </tr>
+                        </template>
                         </template>
                     </tbody>
                 </table>

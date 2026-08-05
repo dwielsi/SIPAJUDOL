@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Report;
+use App\Models\ScanResult;
 use App\Models\Setting;
 use App\Repositories\Contracts\ReportRepositoryInterface;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -18,6 +19,7 @@ class ReportService
     {
         $data['report_number'] = $this->generateReportNumber();
         $data['status'] = $data['status'] ?? 'draft';
+        $data = $this->fillFromScanResult($data);
 
         $report = $this->reports->create($data);
 
@@ -28,6 +30,8 @@ class ReportService
 
     public function update(Report $report, array $data): Report
     {
+        $data = $this->fillFromScanResult($data);
+
         $report = $this->reports->update($report, $data);
 
         $this->generatePdf($report);
@@ -60,6 +64,41 @@ class ReportService
         $report->forceFill(['pdf_path' => $path])->saveQuietly();
 
         return $path;
+    }
+
+    private function fillFromScanResult(array $data): array
+    {
+        if (empty($data['scan_result_id'])) {
+            return $data;
+        }
+
+        $needsSummary = empty($data['summary']);
+        $needsConclusion = empty($data['conclusion']);
+        $needsRecommendation = empty($data['recommendation']);
+
+        if (! $needsSummary && ! $needsConclusion && ! $needsRecommendation) {
+            return $data;
+        }
+
+        $scanResult = ScanResult::find($data['scan_result_id']);
+
+        if (! $scanResult) {
+            return $data;
+        }
+
+        if ($needsSummary && $scanResult->ai_summary) {
+            $data['summary'] = $scanResult->ai_summary;
+        }
+
+        if ($needsConclusion && $scanResult->ai_conclusion) {
+            $data['conclusion'] = $scanResult->ai_conclusion;
+        }
+
+        if ($needsRecommendation && $scanResult->ai_recommendation) {
+            $data['recommendation'] = $scanResult->ai_recommendation;
+        }
+
+        return $data;
     }
 
     private function generateReportNumber(): string

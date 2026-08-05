@@ -5,20 +5,25 @@ namespace App\DataTables;
 use App\Models\Website;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
 class WebsiteDataTable
 {
-    public function query(): Builder
+    public function query(Request $request): Builder
     {
-        return Website::query();
+        return Website::query()
+            ->when(
+                $request->query('status'),
+                fn (Builder $query, string $status) => $query->where('status', $status),
+            );
     }
 
-    public function ajax(): JsonResponse
+    public function ajax(Request $request): JsonResponse
     {
         $user = auth()->user();
 
-        return DataTables::eloquent($this->query())
+        return DataTables::eloquent($this->query($request))
             ->addColumn('badge', fn (Website $website) => [
                 'color' => $website->statusColor(),
                 'label' => $website->statusLabel(),

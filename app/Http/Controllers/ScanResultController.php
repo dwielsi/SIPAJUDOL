@@ -20,7 +20,7 @@ class ScanResultController extends Controller
         Gate::authorize('viewAny', ScanResult::class);
 
         if ($request->ajax()) {
-            return $dataTable->ajax();
+            return $dataTable->ajax($request);
         }
 
         return view('scan-results.index');

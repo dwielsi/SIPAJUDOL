@@ -32,11 +32,13 @@ class WebsiteService
             $data['domain'] = rtrim(preg_replace('#^https?://#i', '', trim($data['domain'])), '/');
         }
 
-        $data['status'] = $data['status'] ?? 'safe';
-
-        if (! empty($data['website_name'])) {
-            $data['name'] = $data['website_name'];
+        if (empty($data['website_name'])) {
+            $data['website_name'] = $data['domain'] ?? $data['opd_name'] ?? null;
         }
+
+        $data['name'] = $data['website_name'];
+
+        $data['status'] = $data['status'] ?? 'needs_review';
 
         return $data;
     }

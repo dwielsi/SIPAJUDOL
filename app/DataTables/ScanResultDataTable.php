@@ -5,20 +5,27 @@ namespace App\DataTables;
 use App\Models\ScanResult;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
 class ScanResultDataTable
 {
-    public function query(): Builder
+    public function query(Request $request): Builder
     {
-        return ScanResult::query()->with('website')->latest('scan_date');
+        return ScanResult::query()
+            ->with('website')
+            ->latest('scan_date')
+            ->when(
+                $request->query('state') === 'in_progress',
+                fn (Builder $query) => $query->inProgress(),
+            );
     }
 
-    public function ajax(): JsonResponse
+    public function ajax(Request $request): JsonResponse
     {
         $user = auth()->user();
 
-        return DataTables::eloquent($this->query())
+        return DataTables::eloquent($this->query($request))
             ->addColumn('website_name', fn (ScanResult $scanResult) => $scanResult->website?->website_name ?? '—')
             ->addColumn('domain', fn (ScanResult $scanResult) => $scanResult->website?->domain ?? '—')
             ->addColumn('scan_date_label', fn (ScanResult $scanResult) => $scanResult->scan_date->translatedFormat('d M Y'))

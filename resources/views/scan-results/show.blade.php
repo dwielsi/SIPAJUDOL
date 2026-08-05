@@ -75,9 +75,23 @@
         <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
             <x-card class="lg:col-span-2">
                 <h2 class="mb-3 font-heading text-sm font-semibold text-slate-900 dark:text-white">Screenshot Website</h2>
-                <div class="flex h-48 items-center justify-center rounded-xl border border-dashed border-slate-300 text-center text-sm text-slate-400 dark:border-slate-700">
-                    Fitur tangkapan layar akan tersedia pada pembaruan berikutnya.
-                </div>
+                @if ($scanResult->screenshot_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($scanResult->screenshot_path))
+                    <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($scanResult->screenshot_path) }}" target="_blank" rel="noopener">
+                        <img
+                            src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($scanResult->screenshot_path) }}"
+                            alt="Screenshot {{ $scanResult->website?->website_name }}"
+                            class="w-full rounded-xl border border-slate-200 object-cover object-top dark:border-slate-700"
+                        >
+                    </a>
+                @elseif ($scanResult->scan_state === 'completed')
+                    <div class="flex h-48 items-center justify-center rounded-xl border border-dashed border-slate-300 text-center text-sm text-slate-400 dark:border-slate-700">
+                        Tangkapan layar tidak tersedia untuk pemindaian ini.
+                    </div>
+                @else
+                    <div class="flex h-48 items-center justify-center rounded-xl border border-dashed border-slate-300 text-center text-sm text-slate-400 dark:border-slate-700">
+                        Tangkapan layar akan tersedia setelah pemindaian selesai.
+                    </div>
+                @endif
             </x-card>
 
             <x-card>

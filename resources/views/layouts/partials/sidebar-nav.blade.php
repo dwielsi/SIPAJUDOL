@@ -20,12 +20,14 @@
             'route' => 'scan-results.create',
             'label' => 'Scan Website',
             'permission' => 'scans.create',
+            'active' => ['scan-results.create'],
             'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>',
         ],
         [
             'route' => 'scan-results.index',
             'label' => 'Riwayat Scan',
             'permission' => 'scans.viewAny',
+            'active' => ['scan-results.index', 'scan-results.show', 'scan-results.status', 'scan-results.destroy'],
             'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>',
         ],
         [
@@ -57,8 +59,12 @@
 <nav class="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-4">
     @foreach ($links as $link)
         @if (! isset($link['permission']) || auth()->user()->can($link['permission']))
+            @php
+                $activePatterns = $link['active'] ?? [explode('.', $link['route'])[0] . '*'];
+                $isActive = collect($activePatterns)->contains(fn ($pattern) => request()->routeIs($pattern));
+            @endphp
             <a href="{{ route($link['route']) }}"
-               class="sidebar-link {{ request()->routeIs(explode('.', $link['route'])[0] . '*') || request()->routeIs($link['route']) ? 'active' : '' }}"
+               class="sidebar-link {{ $isActive ? 'active' : '' }}"
                :class="$store.sidebar.collapsed && 'lg:justify-center'">
                 {!! $link['icon'] !!}
                 <span :class="$store.sidebar.collapsed && 'lg:hidden'">{{ $link['label'] }}</span>

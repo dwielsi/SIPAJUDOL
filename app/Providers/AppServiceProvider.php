@@ -18,6 +18,7 @@ use App\Repositories\Contracts\ReportRepositoryInterface;
 use App\Repositories\Contracts\WebsiteRepositoryInterface;
 use App\Repositories\ReportRepository;
 use App\Repositories\WebsiteRepository;
+use App\Services\Scanner\ScreenshotService;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\Event;
@@ -33,6 +34,8 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(WebsiteRepositoryInterface::class, WebsiteRepository::class);
         $this->app->bind(ReportRepositoryInterface::class, ReportRepository::class);
+
+        $this->app->singleton(ScreenshotService::class, fn () => new ScreenshotService(config('scanner.screenshot')));
     }
 
     /**

@@ -1,7 +1,8 @@
-export default function serverTable(endpoint, columns) {
+export default function serverTable(endpoint, columns, filters = {}) {
     return {
         rows: [],
         columns,
+        filters,
         loading: true,
         search: '',
         page: 1,
@@ -37,6 +38,7 @@ export default function serverTable(endpoint, columns) {
                 start: (this.page - 1) * this.perPage,
                 length: this.perPage,
                 'search[value]': this.search,
+                ...this.filters,
             });
 
             this.columns.forEach((col, i) => {

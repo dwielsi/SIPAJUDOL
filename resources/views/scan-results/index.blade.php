@@ -9,7 +9,7 @@
     </x-slot>
 
     <div x-data="{
-            ...serverTable('{{ route('scan-results.index') }}', ['website_name', 'domain', 'scan_date_label', 'badge', 'state_badge', 'actions']),
+            ...serverTable('{{ route('scan-results.index') }}', ['website_name', 'domain', 'scan_date_label', 'badge', 'state_badge', 'actions'], @js(array_filter(['state' => request('state')]))),
             async destroy(row) {
                 const result = await Swal.fire({
                     title: 'Hapus riwayat scan ini?',
@@ -42,6 +42,16 @@
             }
          }"
          class="space-y-4">
+
+        @if (request('state') === 'in_progress')
+            <div class="flex items-center gap-2 rounded-lg bg-primary-50 px-4 py-2.5 text-sm text-primary-700 dark:bg-primary-500/10 dark:text-primary-400">
+                <span>Menampilkan filter: <strong>Sedang Scan</strong></span>
+                <a href="{{ route('scan-results.index') }}" class="ml-auto inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium hover:bg-primary-100 dark:hover:bg-primary-500/20">
+                    Hapus filter
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </a>
+            </div>
+        @endif
 
         <x-card :padding="false">
             <div class="flex flex-col gap-3 border-b border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800">
@@ -91,7 +101,8 @@
                             </tr>
                         </template>
 
-                        <template x-if="!loading" x-for="row in rows" :key="row.id">
+                        <template x-if="!loading">
+                        <template x-for="row in rows" :key="row.id">
                             <tr class="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
                                 <td class="px-4 py-3.5">
                                     <p class="font-medium text-slate-700 dark:text-slate-200" x-text="row.website_name"></p>
@@ -128,6 +139,7 @@
                                     </div>
                                 </td>
                             </tr>
+                        </template>
                         </template>
                     </tbody>
                 </table>

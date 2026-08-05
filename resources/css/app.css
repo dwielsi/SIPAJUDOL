@@ -32,10 +32,48 @@
 
 @layer components {
     .sidebar-link {
-        @apply flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white;
+        @apply relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-all duration-200 ease-out hover:translate-x-0.5 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white;
+    }
+
+    .sidebar-link svg {
+        @apply transition-transform duration-200 ease-out;
+    }
+
+    .sidebar-link:hover svg {
+        @apply scale-110;
+    }
+
+    .sidebar-link:active {
+        @apply scale-[0.97];
     }
 
     .sidebar-link.active {
-        @apply bg-primary-50 text-primary-700 dark:bg-primary-600/10 dark:text-primary-400;
+        @apply bg-primary-50 text-primary-700 shadow-sm shadow-primary-900/5 dark:bg-primary-600/10 dark:text-primary-400;
+        animation: sidebar-link-in 0.2s ease-out;
+    }
+
+    .sidebar-link.active::before {
+        content: '';
+        @apply absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-primary-600 dark:bg-primary-400;
+        animation: sidebar-indicator-in 0.2s ease-out;
+    }
+
+    .sidebar-link.active svg {
+        @apply text-primary-600 dark:text-primary-400;
+    }
+}
+
+@keyframes sidebar-link-in {
+    from {
+        background-color: transparent;
+    }
+}
+
+@keyframes sidebar-indicator-in {
+    from {
+        transform: translateY(-50%) scaleY(0);
+    }
+    to {
+        transform: translateY(-50%) scaleY(1);
     }
 }

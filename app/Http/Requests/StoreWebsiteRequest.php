@@ -26,19 +26,7 @@ class StoreWebsiteRequest extends FormRequest
     {
         return [
             'opd_name' => ['required', 'string', 'max:255'],
-            'website_name' => ['required', 'string', 'max:255'],
             'domain' => ['required', 'string', 'max:255', Rule::unique('websites', 'domain')],
-            'subdomain' => ['nullable', 'string', 'max:255'],
-            'ip_server' => ['nullable', 'ip'],
-            'hosting' => ['nullable', 'string', 'max:255'],
-            'cms' => ['nullable', 'string', 'max:255'],
-            'cms_version' => ['nullable', 'string', 'max:100'],
-            'server_location' => ['nullable', 'string', 'max:255'],
-            'admin_name' => ['nullable', 'string', 'max:255'],
-            'admin_email' => ['nullable', 'email', 'max:255'],
-            'admin_phone' => ['nullable', 'string', 'max:30'],
-            'status' => ['required', Rule::in(['safe', 'needs_review', 'flagged'])],
-            'notes' => ['nullable', 'string'],
         ];
     }
 }

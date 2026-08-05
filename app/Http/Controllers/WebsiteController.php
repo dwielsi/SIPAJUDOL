@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\DataTables\WebsiteDataTable;
 use App\Http\Requests\StoreWebsiteRequest;
 use App\Http\Requests\UpdateWebsiteRequest;
+use App\Jobs\ScanWebsiteJob;
+use App\Models\ScanResult;
 use App\Models\Website;
 use App\Services\WebsiteService;
 use Illuminate\Http\JsonResponse;
@@ -24,7 +26,7 @@ class WebsiteController extends Controller
         Gate::authorize('viewAny', Website::class);
 
         if ($request->ajax()) {
-            return $dataTable->ajax();
+            return $dataTable->ajax($request);
         }
 
         return view('websites.index');
@@ -39,9 +41,18 @@ class WebsiteController extends Controller
 
     public function store(StoreWebsiteRequest $request): RedirectResponse
     {
-        $this->websites->create($request->validated());
+        $website = $this->websites->create($request->validated());
 
-        return redirect()->route('websites.index')->with('success', 'Website berhasil ditambahkan.');
+        $scanResult = ScanResult::create([
+            'website_id' => $website->id,
+            'scan_date' => now(),
+            'scan_state' => 'queued',
+        ]);
+
+        ScanWebsiteJob::dispatch($website, $scanResult);
+
+        return redirect()->route('scan-results.show', $scanResult)
+            ->with('success', "Website {$website->domain} berhasil ditambahkan. Analisis otomatis sedang berjalan untuk memeriksa indikasi judi online.");
     }
 
     public function show(Website $website): View

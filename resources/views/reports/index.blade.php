@@ -93,7 +93,8 @@
                             </tr>
                         </template>
 
-                        <template x-if="!loading" x-for="row in rows" :key="row.id">
+                        <template x-if="!loading">
+                        <template x-for="row in rows" :key="row.id">
                             <tr class="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
                                 <td class="px-4 py-3.5 font-medium text-slate-700 dark:text-slate-200" x-text="row.report_number"></td>
                                 <td class="px-4 py-3.5 text-slate-500 dark:text-slate-400" x-text="row.website_name"></td>
@@ -125,6 +126,7 @@
                                     </div>
                                 </td>
                             </tr>
+                        </template>
                         </template>
                     </tbody>
                 </table>

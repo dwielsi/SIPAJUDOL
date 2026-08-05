@@ -7,6 +7,18 @@ return [
     'timeout' => env('SCANNER_TIMEOUT', 10),
     'user_agent' => 'SIPAJUDOL-Scanner/1.0 (+Diskominfo Kubu Raya Security Monitoring)',
 
+    'screenshot' => [
+        'enabled' => env('SCANNER_SCREENSHOT_ENABLED', true),
+        'disk' => env('SCANNER_SCREENSHOT_DISK', 'public'),
+        'node_binary' => env('SCANNER_SCREENSHOT_NODE_BINARY'),
+        'npm_binary' => env('SCANNER_SCREENSHOT_NPM_BINARY'),
+        'node_modules_path' => env('SCANNER_SCREENSHOT_NODE_MODULES_PATH', base_path('node_modules')),
+        'chrome_path' => env('SCANNER_SCREENSHOT_CHROME_PATH'),
+        'width' => env('SCANNER_SCREENSHOT_WIDTH', 1280),
+        'height' => env('SCANNER_SCREENSHOT_HEIGHT', 800),
+        'timeout' => env('SCANNER_SCREENSHOT_TIMEOUT', 30),
+    ],
+
     'severity_weights' => [
         'critical' => 25,
         'high' => 15,

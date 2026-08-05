@@ -32,6 +32,7 @@ class WebsiteScannerService
     public function __construct(
         private readonly NotificationService $notifications,
         private readonly AiAnalysisService $ai,
+        private readonly ScreenshotService $screenshots,
     ) {}
 
     public function run(Website $website, ScanResult $scanResult): ScanResult
@@ -61,6 +62,14 @@ class WebsiteScannerService
             }
 
             $homepage = $pages[0];
+
+            $scanResult->update([
+                'progress_percent' => 72,
+                'current_step' => 'Mengambil tangkapan layar website',
+            ]);
+
+            $screenshotPath = $this->screenshots->capture($homepage->url, "{$website->domain}-{$scanResult->id}");
+
             $keywords = Keyword::query()->where('active', true)->pluck('keyword')->all();
 
             $pageDetectors = [
@@ -135,10 +144,13 @@ class WebsiteScannerService
                 ->filter(fn ($f) => in_array($f->category, $categories, true))
                 ->count();
 
-            $keywordCount = $countByCategory(['keyword_judol']);
-            $judolLinkCount = $countByCategory(['hidden_link']);
+            $keywordCount = $countByCategory(['keyword_judol', 'seo_spam', 'meta_tag_spam']);
+            $judolLinkCount = $countByCategory(['hidden_link', 'iframe']);
             $redirectCount = $countByCategory(['redirect']);
-            $malwareCount = $countByCategory(['malware_signature', 'backdoor', 'php_shell', 'foreign_file']);
+            $malwareCount = $countByCategory([
+                'malware_signature', 'backdoor', 'php_shell', 'foreign_file',
+                'script_injection', 'js_injection', 'eval_base64', 'defacement',
+            ]);
             $externalLinkCount = $countByCategory(['external_link']);
 
             $ai = $this->ai->analyze($findings, $riskScore, $status, $website->website_name);
@@ -160,6 +172,7 @@ class WebsiteScannerService
                 'redirect_count' => $redirectCount,
                 'malware_count' => $malwareCount,
                 'external_link_count' => $externalLinkCount,
+                'screenshot_path' => $screenshotPath,
                 'findings_summary' => $ai['summary'],
                 'ai_summary' => $ai['summary'],
                 'ai_conclusion' => $ai['conclusion'],

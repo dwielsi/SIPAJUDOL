@@ -1,4 +1,4 @@
-@props(['label', 'value', 'color' => 'primary', 'icon' => null])
+@props(['label', 'value', 'color' => 'primary', 'icon' => null, 'href' => null])
 
 @php
     $colors = [
@@ -9,14 +9,30 @@
     ];
 @endphp
 
-<x-card>
-    <div class="flex items-center gap-4">
-        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl {{ $colors[$color] ?? $colors['primary'] }}">
-            {!! $icon !!}
+@if ($href)
+    <a href="{{ $href }}" class="block rounded-2xl transition hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+        <x-card>
+            <div class="flex items-center gap-4">
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl {{ $colors[$color] ?? $colors['primary'] }}">
+                    {!! $icon !!}
+                </div>
+                <div class="min-w-0">
+                    <p class="truncate text-sm font-medium text-slate-500 dark:text-slate-400">{{ $label }}</p>
+                    <p class="font-heading text-2xl font-semibold text-slate-900 dark:text-white">{{ $value }}</p>
+                </div>
+            </div>
+        </x-card>
+    </a>
+@else
+    <x-card>
+        <div class="flex items-center gap-4">
+            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl {{ $colors[$color] ?? $colors['primary'] }}">
+                {!! $icon !!}
+            </div>
+            <div class="min-w-0">
+                <p class="truncate text-sm font-medium text-slate-500 dark:text-slate-400">{{ $label }}</p>
+                <p class="font-heading text-2xl font-semibold text-slate-900 dark:text-white">{{ $value }}</p>
+            </div>
         </div>
-        <div class="min-w-0">
-            <p class="truncate text-sm font-medium text-slate-500 dark:text-slate-400">{{ $label }}</p>
-            <p class="font-heading text-2xl font-semibold text-slate-900 dark:text-white">{{ $value }}</p>
-        </div>
-    </div>
-</x-card>
+    </x-card>
+@endif

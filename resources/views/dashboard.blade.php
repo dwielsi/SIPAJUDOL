@@ -8,36 +8,42 @@
             label="Total Website"
             :value="$totalWebsites"
             color="primary"
+            :href="route('websites.index')"
             icon='<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18M8 4v5"/></svg>'
         />
         <x-stat-card
             label="Website Aman"
             :value="$safeWebsites"
             color="success"
+            :href="route('websites.index', ['status' => 'safe'])"
             icon='<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>'
         />
         <x-stat-card
             label="Website Terindikasi"
             :value="$flaggedWebsites"
             color="danger"
+            :href="route('websites.index', ['status' => 'flagged'])"
             icon='<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>'
         />
         <x-stat-card
             label="Perlu Pemeriksaan"
             :value="$needsReviewWebsites"
             color="warning"
+            :href="route('websites.index', ['status' => 'needs_review'])"
             icon='<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5m0 3h.01"/></svg>'
         />
         <x-stat-card
             label="Sedang Scan"
             :value="$scanningCount"
             color="primary"
+            :href="route('scan-results.index', ['state' => 'in_progress'])"
             icon='<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>'
         />
         <x-stat-card
             label="Total Laporan"
             :value="$totalReports"
             color="primary"
+            :href="route('reports.index')"
             icon='<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6M9 9h1"/></svg>'
         />
     </div>
