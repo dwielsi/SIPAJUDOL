@@ -29,6 +29,7 @@ class RolePermissionSeeder extends Seeder
             'reports.update',
             'reports.delete',
             'reports.print',
+            'reports.send',
             'scans.viewAny',
             'scans.view',
             'scans.create',
@@ -40,6 +41,7 @@ class RolePermissionSeeder extends Seeder
             'keywords.update',
             'keywords.delete',
             'activity_logs.viewAny',
+            'settings.manage',
         ];
 
         foreach ($permissions as $permission) {
@@ -58,6 +60,7 @@ class RolePermissionSeeder extends Seeder
             'reports.view',
             'reports.create',
             'reports.print',
+            'reports.send',
             'scans.viewAny',
             'scans.view',
             'scans.create',

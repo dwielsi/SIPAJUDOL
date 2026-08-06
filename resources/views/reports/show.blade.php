@@ -12,6 +12,12 @@
                         Cetak Laporan
                     </x-button>
                 @endcan
+                @can('send', $report)
+                    <x-button variant="secondary" x-data @click="$dispatch('open-modal', 'send-report')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                        Kirim ke Instansi
+                    </x-button>
+                @endcan
                 @can('update', $report)
                     <x-button variant="secondary" onclick="window.location='{{ route('reports.edit', $report) }}'">Ubah</x-button>
                 @endcan
@@ -26,6 +32,12 @@
                     {{ match($report->status) { 'final' => 'Final', 'submitted' => 'Diserahkan', default => 'Draf' } }}
                 </x-badge>
                 <span class="text-sm text-slate-400">Analis: {{ $report->analyst }}</span>
+                @if ($report->sent_at)
+                    <span class="inline-flex items-center gap-1 text-sm text-success-600 dark:text-success-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                        Terkirim ke {{ $report->sent_to }} &middot; {{ $report->sent_at->translatedFormat('d M Y H:i') }}
+                    </span>
+                @endif
             </div>
 
             @if ($report->scanResult)
@@ -89,4 +101,32 @@
             </x-card>
         @endif
     </div>
+
+    @can('send', $report)
+        <x-modal name="send-report" maxWidth="md" :show="$errors->has('email') || $errors->has('note')">
+            <form method="POST" action="{{ route('reports.send', $report) }}" class="p-6">
+                @csrf
+                <h3 class="font-heading text-base font-semibold text-slate-900 dark:text-white">Kirim Laporan ke Instansi</h3>
+                <p class="mt-1 text-xs text-slate-400">Laporan PDF akan dilampirkan dan dikirim melalui email ke pengelola website terkait.</p>
+
+                <div class="mt-4 space-y-4">
+                    <div>
+                        <x-input-label for="send_email" value="Email Tujuan" />
+                        <x-text-input id="send_email" name="email" type="email" class="w-full" :value="$report->sent_to ?? $report->scanResult?->website?->admin_email" required />
+                        <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                    </div>
+                    <div>
+                        <x-input-label for="send_note" value="Catatan Tambahan (opsional)" />
+                        <textarea id="send_note" name="note" rows="3" class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500"></textarea>
+                        <x-input-error :messages="$errors->get('note')" class="mt-2" />
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end gap-3">
+                    <x-button variant="secondary" type="button" x-data @click="$dispatch('close-modal', 'send-report')">Batal</x-button>
+                    <x-button variant="primary" type="submit">Kirim</x-button>
+                </div>
+            </form>
+        </x-modal>
+    @endcan
 </x-app-layout>

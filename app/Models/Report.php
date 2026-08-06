@@ -22,12 +22,15 @@ class Report extends Model
         'status',
         'pdf_path',
         'qr_code_path',
+        'sent_at',
+        'sent_to',
     ];
 
     protected function casts(): array
     {
         return [
             'report_date' => 'date',
+            'sent_at' => 'datetime',
         ];
     }
 

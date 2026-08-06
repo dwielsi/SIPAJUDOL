@@ -36,4 +36,9 @@ class ReportPolicy
     {
         return $user->can('reports.print');
     }
+
+    public function send(User $user, Report $report): bool
+    {
+        return $user->can('reports.send');
+    }
 }

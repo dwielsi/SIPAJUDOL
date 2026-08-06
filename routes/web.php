@@ -9,6 +9,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ScanProgressController;
 use App\Http\Controllers\ScanResultController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\WebsiteController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +23,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('websites', WebsiteController::class);
 
     Route::get('reports/{report}/pdf', [ReportController::class, 'pdf'])->name('reports.pdf');
+    Route::post('reports/{report}/send', [ReportController::class, 'send'])->name('reports.send');
     Route::resource('reports', ReportController::class);
 
     Route::resource('scan-results', ScanResultController::class)->except(['edit', 'update']);
@@ -37,6 +39,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('keywords', KeywordController::class)->only(['index', 'store', 'update', 'destroy']);
 
     Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
+
+    Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
+    Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+    Route::post('/settings/test-email', [SettingController::class, 'testEmail'])->name('settings.test-email');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

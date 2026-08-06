@@ -18,6 +18,7 @@ use App\Repositories\Contracts\ReportRepositoryInterface;
 use App\Repositories\Contracts\WebsiteRepositoryInterface;
 use App\Repositories\ReportRepository;
 use App\Repositories\WebsiteRepository;
+use App\Services\MailSettingsService;
 use App\Services\Scanner\ScreenshotService;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
@@ -47,6 +48,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Report::class, ReportPolicy::class);
         Gate::policy(ScanResult::class, ScanResultPolicy::class);
         Gate::policy(Keyword::class, KeywordPolicy::class);
+
+        Gate::define('manage-settings', fn ($user) => $user->can('settings.manage'));
+
+        $this->app->make(MailSettingsService::class)->apply();
 
         Website::observe(WebsiteObserver::class);
         Report::observe(ReportObserver::class);

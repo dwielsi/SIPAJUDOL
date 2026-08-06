@@ -5,14 +5,18 @@ namespace App\Http\Controllers;
 use App\DataTables\ReportDataTable;
 use App\Http\Requests\StoreReportRequest;
 use App\Http\Requests\UpdateReportRequest;
+use App\Mail\ReportMail;
+use App\Models\ActivityLog;
 use App\Models\Report;
 use App\Models\ScanResult;
+use App\Services\MailSettingsService;
 use App\Services\ReportService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -97,6 +101,46 @@ class ReportController extends Controller
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="'.$report->report_number.'.pdf"',
         ]);
+    }
+
+    public function send(Request $request, Report $report): RedirectResponse
+    {
+        Gate::authorize('send', $report);
+
+        $request->validate([
+            'email' => ['required', 'email'],
+            'note' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        if (! $report->pdf_path || ! Storage::exists($report->pdf_path)) {
+            $this->reports->generatePdf($report);
+        }
+
+        app(MailSettingsService::class)->apply();
+
+        try {
+            Mail::to($request->input('email'))->send(new ReportMail($report, $request->input('note')));
+        } catch (\Throwable $e) {
+            return redirect()->route('reports.show', $report)
+                ->with('error', 'Gagal mengirim laporan: '.$e->getMessage());
+        }
+
+        $report->forceFill([
+            'sent_at' => now(),
+            'sent_to' => $request->input('email'),
+        ])->saveQuietly();
+
+        ActivityLog::create([
+            'user_id' => $request->user()->id,
+            'action' => 'report.sent',
+            'subject_type' => Report::class,
+            'subject_id' => $report->id,
+            'description' => "Mengirim laporan {$report->report_number} ke {$request->input('email')}",
+            'ip_address' => $request->ip(),
+        ]);
+
+        return redirect()->route('reports.show', $report)
+            ->with('success', 'Laporan berhasil dikirim ke '.$request->input('email').'.');
     }
 
     private function scanResultOptions()
