@@ -29,17 +29,6 @@ class ReportEmailTest extends TestCase
         $response->assertSee('Konfigurasi SMTP');
     }
 
-    public function test_operator_cannot_access_settings(): void
-    {
-        $this->seed(RolePermissionSeeder::class);
-        $user = User::factory()->create();
-        $user->assignRole(RoleEnum::Operator->value);
-
-        $response = $this->actingAs($user)->get(route('settings.edit'));
-
-        $response->assertForbidden();
-    }
-
     public function test_settings_update_persists_smtp_config(): void
     {
         $this->seed(RolePermissionSeeder::class);

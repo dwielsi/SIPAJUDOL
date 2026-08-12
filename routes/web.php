@@ -10,6 +10,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ScanProgressController;
 use App\Http\Controllers\ScanResultController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\SpkController;
 use App\Http\Controllers\WebsiteController;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,8 @@ Route::middleware('auth')->group(function () {
     Route::get('scan-results/{scanResult}/status', [ScanProgressController::class, 'status'])->name('scan-results.status');
 
     Route::get('/monitoring', [MonitoringController::class, 'index'])->name('monitoring.index');
+
+    Route::get('/spk', [SpkController::class, 'index'])->name('spk.index');
 
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/unread', [NotificationController::class, 'unread'])->name('notifications.unread');

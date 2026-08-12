@@ -17,13 +17,5 @@ class UserSeeder extends Seeder
             'password' => 'password',
         ]);
         $kabid->assignRole(RoleEnum::Kabid->value);
-
-        $operator = User::factory()->create([
-            'name' => 'Operator Monitoring',
-            'username' => 'operator',
-            'email' => 'operator@sipajudol.test',
-            'password' => 'password',
-        ]);
-        $operator->assignRole(RoleEnum::Operator->value);
     }
 }

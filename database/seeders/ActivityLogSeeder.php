@@ -14,13 +14,11 @@ class ActivityLogSeeder extends Seeder
     public function run(): void
     {
         $kabid = User::where('username', 'kabid')->first();
-        $operator = User::where('username', 'operator')->first();
 
         $entries = [
-            ['user' => $operator, 'action' => 'auth.login', 'description' => 'Operator Monitoring masuk ke sistem'],
-            ['user' => $operator, 'action' => 'website.created', 'description' => 'Menambahkan website baru untuk dipantau'],
-            ['user' => $operator, 'action' => 'scan.completed', 'description' => 'Pemindaian selesai dijalankan'],
             ['user' => $kabid, 'action' => 'auth.login', 'description' => 'Kepala Bidang masuk ke sistem'],
+            ['user' => $kabid, 'action' => 'website.created', 'description' => 'Menambahkan website baru untuk dipantau'],
+            ['user' => $kabid, 'action' => 'scan.completed', 'description' => 'Pemindaian selesai dijalankan'],
             ['user' => $kabid, 'action' => 'report.generated', 'description' => 'Membuat laporan pemindaian'],
         ];
 

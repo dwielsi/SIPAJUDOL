@@ -35,6 +35,7 @@ class RolePermissionSeeder extends Seeder
             'scans.create',
             'scans.delete',
             'monitoring.view',
+            'spk.view',
             'notifications.view',
             'keywords.viewAny',
             'keywords.create',
@@ -50,22 +51,5 @@ class RolePermissionSeeder extends Seeder
 
         $kabid = Role::firstOrCreate(['name' => RoleEnum::Kabid->value, 'guard_name' => 'web']);
         $kabid->syncPermissions($permissions);
-
-        $operator = Role::firstOrCreate(['name' => RoleEnum::Operator->value, 'guard_name' => 'web']);
-        $operator->syncPermissions([
-            'dashboard.view',
-            'websites.viewAny',
-            'websites.view',
-            'reports.viewAny',
-            'reports.view',
-            'reports.create',
-            'reports.print',
-            'reports.send',
-            'scans.viewAny',
-            'scans.view',
-            'scans.create',
-            'monitoring.view',
-            'notifications.view',
-        ]);
     }
 }
