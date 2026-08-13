@@ -108,6 +108,6 @@ class ReportService
 
         $romanMonths = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
 
-        return sprintf('%03d/LAP-JUDOL/%s/%d', $sequence, $romanMonths[now()->month - 1], $year);
+        return sprintf('%03d/LAP-SIDEPSIL/%s/%d', $sequence, $romanMonths[now()->month - 1], $year);
     }
 }
