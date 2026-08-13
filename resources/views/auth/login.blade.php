@@ -1,6 +1,6 @@
 <x-guest-layout>
     <h2 class="mb-1 font-heading text-xl font-semibold text-slate-900 dark:text-white">Masuk ke Akun Anda</h2>
-    <p class="mb-6 text-sm text-slate-500 dark:text-slate-400">Silakan masuk untuk mengakses SIPAJUDOL.</p>
+    <p class="mb-6 text-sm text-slate-500 dark:text-slate-400">Silakan masuk untuk mengakses SIDEPSIL.</p>
 
     <x-auth-session-status class="mb-4" :status="session('status')" />
 

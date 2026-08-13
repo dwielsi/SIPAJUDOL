@@ -47,7 +47,7 @@
             <tr>
                 <td style="width: 100%; text-align: center;">
                     <div class="instansi">Pemerintah Kabupaten Kubu Raya</div>
-                    <div class="unit">{{ $setting->instansi_name ?? config('app.name', 'SIPAJUDOL') }}</div>
+                    <div class="unit">{{ $setting->instansi_name ?? config('app.name', 'SIDEPSIL') }}</div>
                     <div class="address">{{ $setting->address ?? '-' }}</div>
                 </td>
             </tr>
@@ -55,7 +55,7 @@
     </header>
 
     <footer>
-        Dokumen ini dicetak melalui {{ config('app.name', 'SIPAJUDOL') }} pada {{ now()->translatedFormat('d M Y, H:i') }} WIB
+        Dokumen ini dicetak melalui {{ config('app.name', 'SIDEPSIL') }} pada {{ now()->translatedFormat('d M Y, H:i') }} WIB
     </footer>
 
     <table class="letter-meta">
@@ -101,7 +101,7 @@
     <p>Dengan hormat,</p>
 
     <p>
-        Berdasarkan hasil pemantauan dan pemeriksaan yang dilakukan oleh {{ $setting->instansi_name ?? config('app.name', 'SIPAJUDOL') }}
+        Berdasarkan hasil pemantauan dan pemeriksaan yang dilakukan oleh {{ $setting->instansi_name ?? config('app.name', 'SIDEPSIL') }}
         @if ($report->scanResult)
             pada tanggal {{ $report->scanResult->scan_date->translatedFormat('d F Y') }} terhadap website resmi
             <strong>{{ $report->scanResult->website->opd_name ?? $report->scanResult->website->website_name ?? '-' }}</strong> ({{ $report->scanResult->website->domain ?? '-' }}),

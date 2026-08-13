@@ -50,10 +50,10 @@ class SettingController extends Controller
 
         try {
             Mail::raw(
-                "Ini adalah email uji coba konfigurasi SMTP dari {$request->user()->name} melalui SIPAJUDOL.",
+                "Ini adalah email uji coba konfigurasi SMTP dari {$request->user()->name} melalui SIDEPSIL.",
                 function ($message) use ($request) {
                     $message->to($request->input('email'))
-                        ->subject('Uji Coba Konfigurasi SMTP - SIPAJUDOL');
+                        ->subject('Uji Coba Konfigurasi SMTP - SIDEPSIL');
                 }
             );
 

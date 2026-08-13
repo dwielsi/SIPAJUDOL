@@ -81,7 +81,7 @@ class Crawler
         for ($hop = 0; $hop < 5; $hop++) {
             try {
                 $response = Http::withOptions(['allow_redirects' => false])
-                    ->withUserAgent($this->config['user_agent'] ?? 'SIPAJUDOL-Scanner/1.0')
+                    ->withUserAgent($this->config['user_agent'] ?? 'SIDEPSIL-Scanner/1.0')
                     ->timeout((int) ($this->config['timeout'] ?? 10))
                     ->get($current);
             } catch (Throwable) {

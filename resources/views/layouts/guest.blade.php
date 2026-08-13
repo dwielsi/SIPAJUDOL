@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'SIPAJUDOL') }}</title>
+        <title>{{ config('app.name', 'SIDEPSIL') }}</title>
 
         @include('partials.theme-init')
 
@@ -23,8 +23,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h1 class="font-heading text-lg font-semibold text-slate-900 dark:text-white">SIPAJUDOL</h1>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Sistem Informasi Pemantauan &amp; Pelaporan Website Judol</p>
+                    <h1 class="font-heading text-lg font-semibold text-slate-900 dark:text-white">SIDEPSIL</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Sistem Informasi Deteksi &amp; Pelaporan Penyisipan Konten Ilegal</p>
                 </div>
             </div>
 

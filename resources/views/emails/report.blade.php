@@ -11,8 +11,8 @@
                 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:12px; overflow:hidden;">
                     <tr>
                         <td style="background-color:#0f172a; padding:20px 28px;">
-                            <p style="margin:0; color:#ffffff; font-size:14px; font-weight:bold;">{{ $setting->instansi_name ?? config('app.name', 'SIPAJUDOL') }}</p>
-                            <p style="margin:2px 0 0; color:#94a3b8; font-size:12px;">Sistem Informasi Pengawasan Judi Online</p>
+                            <p style="margin:0; color:#ffffff; font-size:14px; font-weight:bold;">{{ $setting->instansi_name ?? config('app.name', 'SIDEPSIL') }}</p>
+                            <p style="margin:2px 0 0; color:#94a3b8; font-size:12px;">Sistem Informasi Deteksi dan Pelaporan Penyisipan Konten Ilegal</p>
                         </td>
                     </tr>
                     <tr>
@@ -57,13 +57,13 @@
                                 @if ($setting->nip ?? null)
                                     NIP. {{ $setting->nip }}<br>
                                 @endif
-                                {{ $setting->instansi_name ?? config('app.name', 'SIPAJUDOL') }}
+                                {{ $setting->instansi_name ?? config('app.name', 'SIDEPSIL') }}
                             </p>
                         </td>
                     </tr>
                     <tr>
                         <td style="background-color:#f8fafc; padding:16px 28px; font-size:11px; color:#94a3b8;">
-                            Surel ini dikirim otomatis oleh {{ config('app.name', 'SIPAJUDOL') }}. Mohon tidak membalas surel ini.
+                            Surel ini dikirim otomatis oleh {{ config('app.name', 'SIDEPSIL') }}. Mohon tidak membalas surel ini.
                         </td>
                     </tr>
                 </table>

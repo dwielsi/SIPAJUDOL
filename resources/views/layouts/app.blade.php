@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ isset($title) ? $title . ' - ' : '' }}{{ config('app.name', 'SIPAJUDOL') }}</title>
+        <title>{{ isset($title) ? $title . ' - ' : '' }}{{ config('app.name', 'SIDEPSIL') }}</title>
 
         @include('partials.theme-init')
 
@@ -39,7 +39,7 @@
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
                         </svg>
                     </div>
-                    <span class="font-heading text-sm font-semibold text-slate-900 dark:text-white" :class="$store.sidebar.collapsed && 'lg:hidden'">SIPAJUDOL</span>
+                    <span class="font-heading text-sm font-semibold text-slate-900 dark:text-white" :class="$store.sidebar.collapsed && 'lg:hidden'">SIDEPSIL</span>
                 </div>
 
                 @include('layouts.partials.sidebar-nav')
