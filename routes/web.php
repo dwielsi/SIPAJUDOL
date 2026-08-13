@@ -3,7 +3,6 @@
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KeywordController;
-use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
@@ -27,10 +26,11 @@ Route::middleware('auth')->group(function () {
     Route::post('reports/{report}/send', [ReportController::class, 'send'])->name('reports.send');
     Route::resource('reports', ReportController::class);
 
-    Route::resource('scan-results', ScanResultController::class)->except(['edit', 'update']);
+    Route::resource('scan-results', ScanResultController::class)->except(['edit', 'update', 'create']);
+    Route::post('scan-results/scan-all', [ScanResultController::class, 'scanAll'])->name('scan-results.scan-all');
     Route::get('scan-results/{scanResult}/status', [ScanProgressController::class, 'status'])->name('scan-results.status');
 
-    Route::get('/monitoring', [MonitoringController::class, 'index'])->name('monitoring.index');
+    Route::redirect('/monitoring', '/websites');
 
     Route::get('/spk', [SpkController::class, 'index'])->name('spk.index');
 

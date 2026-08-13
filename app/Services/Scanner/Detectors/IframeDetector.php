@@ -10,6 +10,23 @@ use App\Services\Scanner\Support\HtmlDom;
 
 class IframeDetector implements DetectorInterface
 {
+    /**
+     * Penyedia embed umum yang legitimate (peta, video, media sosial) — iframe
+     * yang mengarah ke domain ini tidak dianggap indikasi judol selama tidak disembunyikan.
+     */
+    private const TRUSTED_EMBED_DOMAINS = [
+        'google.com',
+        'google.co.id',
+        'gstatic.com',
+        'youtube.com',
+        'youtube-nocookie.com',
+        'vimeo.com',
+        'facebook.com',
+        'instagram.com',
+        'twitter.com',
+        'x.com',
+    ];
+
     public function label(): string
     {
         return 'Iframe Mencurigakan';
@@ -31,6 +48,11 @@ class IframeDetector implements DetectorInterface
             $iframeHost = parse_url($src, PHP_URL_HOST);
             $isExternal = $iframeHost && ! str_ends_with($iframeHost, $host);
             $isHidden = $iframe['hidden'];
+            $isTrusted = $iframeHost && $this->isTrustedDomain($iframeHost);
+
+            if ($isTrusted && ! $isHidden) {
+                continue;
+            }
 
             if (! $isExternal && ! $isHidden) {
                 continue;
@@ -46,5 +68,16 @@ class IframeDetector implements DetectorInterface
         }
 
         return $findings;
+    }
+
+    private function isTrustedDomain(string $host): bool
+    {
+        foreach (self::TRUSTED_EMBED_DOMAINS as $trusted) {
+            if ($host === $trusted || str_ends_with($host, ".{$trusted}")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

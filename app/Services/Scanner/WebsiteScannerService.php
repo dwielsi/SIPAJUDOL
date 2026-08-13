@@ -136,8 +136,12 @@ class WebsiteScannerService
                 ]);
             }
 
+            $uniqueFindings = collect($findings)
+                ->unique(fn ($finding) => "{$finding->category}|{$finding->severity}|{$finding->evidence}")
+                ->all();
+
             $scoring = new RiskScoringService($config['severity_weights']);
-            $riskScore = $scoring->score($findings);
+            $riskScore = $scoring->score($uniqueFindings);
             $status = $scoring->status($riskScore);
 
             $countByCategory = fn (array $categories) => collect($findings)

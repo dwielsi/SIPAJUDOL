@@ -48,6 +48,10 @@ class ScanResultSeeder extends Seeder
                 'website_id' => $website->id,
                 'scan_date' => $fixture['scan_date'],
                 'status' => $fixture['status'],
+                'scan_state' => 'completed',
+                'progress_percent' => 100,
+                'started_at' => $fixture['scan_date'],
+                'completed_at' => $fixture['scan_date'],
                 'risk_score' => $fixture['risk_score'],
                 'threat_type' => $fixture['threat_type'],
                 'keyword_count' => $fixture['keyword_count'],
@@ -55,6 +59,11 @@ class ScanResultSeeder extends Seeder
                 'infected_pages' => $fixture['infected_pages'],
                 'findings_summary' => $fixture['findings_summary'],
                 'notes' => $fixture['notes'],
+            ]);
+
+            $website->update([
+                'last_scanned_at' => $fixture['scan_date'],
+                'latest_risk_score' => $fixture['risk_score'],
             ]);
         }
     }

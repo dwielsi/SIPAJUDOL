@@ -1,16 +1,8 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div>
-            <h1 class="truncate font-heading text-base font-semibold text-slate-900 dark:text-white">Monitoring Website</h1>
-            <p class="text-xs text-slate-400">Kondisi seluruh website OPD secara realtime</p>
-        </div>
-    </x-slot>
-
-    @if ($websites->isEmpty())
+    @if ($monitoredWebsites->isEmpty())
         <x-card><x-empty-state title="Belum ada website terdaftar" /></x-card>
     @else
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            @foreach ($websites as $website)
+            @foreach ($monitoredWebsites as $website)
                 @php
                     $latestScan = $website->scanResults->first();
                     $hasActiveScan = $latestScan && in_array($latestScan->scan_state, ['queued', 'running']);
@@ -66,4 +58,3 @@
             @endforeach
         </div>
     @endif
-</x-app-layout>

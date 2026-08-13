@@ -29,7 +29,21 @@ class WebsiteController extends Controller
             return $dataTable->ajax($request);
         }
 
-        return view('websites.index');
+        $monitoredWebsites = auth()->user()->can('monitoring.view')
+            ? Website::query()
+                ->with(['scanResults' => fn ($query) => $query->latest('scan_date')->limit(1)])
+                ->orderBy('website_name')
+                ->get()
+            : collect();
+
+        $scannableWebsites = Gate::allows('create', ScanResult::class)
+            ? Website::orderBy('website_name')->get()
+            : collect();
+
+        return view('websites.index', [
+            'monitoredWebsites' => $monitoredWebsites,
+            'scannableWebsites' => $scannableWebsites,
+        ]);
     }
 
     public function create(): View

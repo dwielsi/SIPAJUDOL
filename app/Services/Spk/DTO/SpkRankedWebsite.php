@@ -7,7 +7,7 @@ use App\Models\Website;
 final class SpkRankedWebsite
 {
     /**
-     * @param  array<string, array{label: string, raw: float, normalized: float, weight: float, contribution: float}>  $breakdown
+     * @param  array<string, array{label: string, raw: float, max: float, normalized: float, weight: float, contribution: float}>  $breakdown
      */
     public function __construct(
         public readonly Website $website,

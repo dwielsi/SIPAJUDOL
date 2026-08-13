@@ -103,6 +103,13 @@ class HtmlDom
         return $tags;
     }
 
+    /**
+     * Elemen dianggap "tersembunyi" hanya berdasarkan sinyal yang kuat dan spesifik untuk
+     * teknik cloaking (inline style, atribut hidden, atau posisi dibuang ke luar layar).
+     * Nama class seperti "hidden"/"d-none" sengaja TIDAK dipakai sebagai sinyal karena itu
+     * adalah utility class standar Tailwind/Bootstrap untuk menu, dropdown, dan tab yang
+     * legitimate — bukan indikasi cloaking.
+     */
     private function isHiddenNode(DOMElement $node): bool
     {
         $style = strtolower($node->getAttribute('style'));
@@ -111,12 +118,16 @@ class HtmlDom
             str_contains($style, 'display:none') || str_contains($style, 'display: none')
             || str_contains($style, 'visibility:hidden') || str_contains($style, 'visibility: hidden')
             || str_contains($style, 'opacity:0') || str_contains($style, 'opacity: 0')
+            || $this->hasOffscreenPositioning($style)
         ) {
             return true;
         }
 
-        $class = strtolower($node->getAttribute('class'));
+        return $node->getAttribute('hidden') !== '';
+    }
 
-        return str_contains($class, 'hidden') || str_contains($class, 'sr-only') || $node->getAttribute('hidden') !== '';
+    private function hasOffscreenPositioning(string $style): bool
+    {
+        return (bool) preg_match('/-\d{4,}\s*px/', $style);
     }
 }

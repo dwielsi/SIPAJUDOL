@@ -77,7 +77,7 @@ class SawPriorityService
         });
 
         $max = collect($criteriaKeys)->mapWithKeys(
-            fn (string $key) => [$key => (float) $rawMatrix->max(fn ($row) => $row[$key])]
+            fn (string $key) => [$key => (float) $criteria[$key]['max']]
         );
 
         $scored = $scanned->map(function (Website $website) use ($rawMatrix, $max, $criteria, $criteriaKeys) {
@@ -87,13 +87,14 @@ class SawPriorityService
 
             foreach ($criteriaKeys as $key) {
                 $weight = (float) $criteria[$key]['weight'];
-                $normalized = $max[$key] > 0.0 ? $raw[$key] / $max[$key] : 0.0;
+                $normalized = $max[$key] > 0.0 ? min($raw[$key] / $max[$key], 1.0) : 0.0;
                 $contribution = $normalized * $weight;
                 $score += $contribution;
 
                 $breakdown[$key] = [
                     'label' => $criteria[$key]['label'],
                     'raw' => $raw[$key],
+                    'max' => $max[$key],
                     'normalized' => $normalized,
                     'weight' => $weight,
                     'contribution' => $contribution,

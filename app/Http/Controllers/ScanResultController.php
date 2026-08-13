@@ -26,15 +26,6 @@ class ScanResultController extends Controller
         return view('scan-results.index');
     }
 
-    public function create(): View
-    {
-        Gate::authorize('create', ScanResult::class);
-
-        return view('scan-results.create', [
-            'websites' => Website::orderBy('website_name')->get(),
-        ]);
-    }
-
     public function store(StoreScanResultRequest $request): RedirectResponse
     {
         $website = Website::findOrFail($request->validated('website_id'));
@@ -49,6 +40,39 @@ class ScanResultController extends Controller
 
         return redirect()->route('scan-results.show', $scanResult)
             ->with('success', "Pemindaian {$website->website_name} telah dimulai.");
+    }
+
+    public function scanAll(): RedirectResponse
+    {
+        Gate::authorize('create', ScanResult::class);
+
+        $websites = Website::query()
+            ->with(['scanResults' => fn ($query) => $query->latest('scan_date')->limit(1)])
+            ->get()
+            ->reject(function (Website $website) {
+                $latest = $website->scanResults->first();
+
+                return $latest && in_array($latest->scan_state, ['queued', 'running'], true);
+            });
+
+        foreach ($websites as $website) {
+            $scanResult = ScanResult::create([
+                'website_id' => $website->id,
+                'scan_date' => now(),
+                'scan_state' => 'queued',
+            ]);
+
+            ScanWebsiteJob::dispatch($website, $scanResult);
+        }
+
+        $skipped = Website::count() - $websites->count();
+        $message = "Memulai pemindaian untuk {$websites->count()} website.";
+
+        if ($skipped > 0) {
+            $message .= " {$skipped} website dilewati karena sedang dipindai.";
+        }
+
+        return redirect()->route('websites.index')->with('success', $message);
     }
 
     public function show(ScanResult $scanResult): View
