@@ -78,8 +78,14 @@
             @else
                 <ul class="divide-y divide-slate-100 dark:divide-slate-800">
                     @foreach ($topRisky as $website)
-                        <li class="flex items-center justify-between gap-3 px-4 py-3">
-                            <div class="min-w-0">
+                        @php $shot = $website->scanResults->first()?->screenshotUrl(); @endphp
+                        <li class="flex items-center gap-3 px-4 py-3">
+                            @if ($shot)
+                                <img src="{{ $shot }}" alt="" class="h-10 w-10 shrink-0 rounded-lg border border-slate-200 object-cover object-top dark:border-slate-700">
+                            @else
+                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-dashed border-slate-300 text-[10px] text-slate-400 dark:border-slate-700">-</div>
+                            @endif
+                            <div class="min-w-0 flex-1">
                                 <p class="truncate text-sm font-medium text-slate-700 dark:text-slate-200">{{ $website->website_name }}</p>
                                 <p class="truncate text-xs text-slate-400">{{ $website->domain }}</p>
                             </div>
@@ -119,8 +125,14 @@
             @else
                 <ul class="divide-y divide-slate-100 dark:divide-slate-800">
                     @foreach ($newestWebsites as $website)
-                        <li class="flex items-center justify-between gap-3 px-4 py-3">
-                            <div class="min-w-0">
+                        @php $shot = $website->scanResults->first()?->screenshotUrl(); @endphp
+                        <li class="flex items-center gap-3 px-4 py-3">
+                            @if ($shot)
+                                <img src="{{ $shot }}" alt="" class="h-10 w-10 shrink-0 rounded-lg border border-slate-200 object-cover object-top dark:border-slate-700">
+                            @else
+                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-dashed border-slate-300 text-[10px] text-slate-400 dark:border-slate-700">-</div>
+                            @endif
+                            <div class="min-w-0 flex-1">
                                 <p class="truncate text-sm font-medium text-slate-700 dark:text-slate-200">{{ $website->website_name }}</p>
                                 <p class="truncate text-xs text-slate-400">{{ $website->opd_name }}</p>
                             </div>

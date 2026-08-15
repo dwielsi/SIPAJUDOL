@@ -9,8 +9,20 @@
                     $cardData = $hasActiveScan
                         ? "scanProgress('" . route('scan-results.status', $latestScan) . "', { scan_state: '{$latestScan->scan_state}', progress_percent: {$latestScan->progress_percent} })"
                         : "{ isActive: () => false, percent: 0, step: '' }";
+                    $screenshotUrl = $latestScan?->screenshotUrl();
                 @endphp
-                <x-card x-data="{{ $cardData }}">
+                <x-card x-data="{{ $cardData }}" :padding="false">
+                    @if ($screenshotUrl)
+                        <a href="{{ route('websites.show', $website) }}">
+                            <img src="{{ $screenshotUrl }}" alt="Screenshot {{ $website->website_name }}"
+                                 class="h-32 w-full rounded-t-xl border-b border-slate-200 object-cover object-top dark:border-slate-800">
+                        </a>
+                    @else
+                        <div class="flex h-32 w-full items-center justify-center rounded-t-xl border-b border-slate-200 bg-slate-50 text-xs text-slate-400 dark:border-slate-800 dark:bg-slate-800/50">
+                            Belum ada screenshot
+                        </div>
+                    @endif
+                    <div class="p-4">
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
                             <p class="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{{ $website->website_name }}</p>
@@ -53,6 +65,7 @@
                                 </form>
                             </template>
                         @endcan
+                    </div>
                     </div>
                 </x-card>
             @endforeach

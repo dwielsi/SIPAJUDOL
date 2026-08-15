@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class ScanResult extends Model
 {
@@ -84,5 +85,14 @@ class ScanResult extends Model
             'needs_review' => 'warning',
             default => 'success',
         };
+    }
+
+    public function screenshotUrl(): ?string
+    {
+        if (! $this->screenshot_path || ! Storage::disk('public')->exists($this->screenshot_path)) {
+            return null;
+        }
+
+        return Storage::disk('public')->url($this->screenshot_path);
     }
 }

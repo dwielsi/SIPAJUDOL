@@ -1,5 +1,5 @@
     <div x-data="{
-            ...serverTable('{{ route('websites.index') }}', ['opd_name', 'website_name', 'domain', 'badge', 'actions'], @js(array_filter(['status' => request('status')]))),
+            ...serverTable('{{ route('websites.index') }}', ['screenshot_url', 'opd_name', 'website_name', 'domain', 'badge', 'actions'], @js(array_filter(['status' => request('status')]))),
             async destroy(row) {
                 const result = await Swal.fire({
                     title: 'Hapus website ini?',
@@ -66,6 +66,7 @@
                 <table class="w-full text-left text-sm">
                     <thead class="sticky top-0 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:bg-slate-800 dark:text-slate-400">
                         <tr>
+                            <th class="px-4 py-3">Screenshot</th>
                             <th class="px-4 py-3">Nama OPD</th>
                             <th class="px-4 py-3">Website</th>
                             <th class="px-4 py-3">Domain</th>
@@ -77,6 +78,7 @@
                         <template x-if="loading">
                             <template x-for="i in 5" :key="i">
                                 <tr class="animate-pulse">
+                                    <td class="px-4 py-4"><div class="h-10 w-16 rounded bg-slate-200 dark:bg-slate-700"></div></td>
                                     <td class="px-4 py-4"><div class="h-3 w-32 rounded bg-slate-200 dark:bg-slate-700"></div></td>
                                     <td class="px-4 py-4"><div class="h-3 w-36 rounded bg-slate-200 dark:bg-slate-700"></div></td>
                                     <td class="px-4 py-4"><div class="h-3 w-40 rounded bg-slate-200 dark:bg-slate-700"></div></td>
@@ -88,7 +90,7 @@
 
                         <template x-if="!loading && rows.length === 0">
                             <tr>
-                                <td colspan="5">
+                                <td colspan="6">
                                     <x-empty-state title="Belum ada website terdaftar" description="Tambahkan website OPD pertama untuk mulai memantau." />
                                 </td>
                             </tr>
@@ -97,6 +99,14 @@
                         <template x-if="!loading">
                         <template x-for="row in rows" :key="row.id">
                             <tr class="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                                <td class="px-4 py-3.5">
+                                    <template x-if="row.screenshot_url">
+                                        <img :src="row.screenshot_url" alt="" class="h-10 w-16 rounded-md border border-slate-200 object-cover object-top dark:border-slate-700">
+                                    </template>
+                                    <template x-if="!row.screenshot_url">
+                                        <div class="flex h-10 w-16 items-center justify-center rounded-md border border-dashed border-slate-300 text-[10px] text-slate-400 dark:border-slate-700">-</div>
+                                    </template>
+                                </td>
                                 <td class="px-4 py-3.5 font-medium text-slate-700 dark:text-slate-200" x-text="row.opd_name"></td>
                                 <td class="px-4 py-3.5 text-slate-500 dark:text-slate-400" x-text="row.website_name"></td>
                                 <td class="px-4 py-3.5 text-slate-500 dark:text-slate-400" x-text="row.domain"></td>

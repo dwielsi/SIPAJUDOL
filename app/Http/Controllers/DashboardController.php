@@ -27,6 +27,7 @@ class DashboardController extends Controller
         });
 
         $topRisky = Website::query()
+            ->with(['scanResults' => fn ($query) => $query->latest('scan_date')->limit(1)])
             ->orderByDesc('latest_risk_score')
             ->limit(5)
             ->get(['id', 'website_name', 'domain', 'latest_risk_score', 'status']);
@@ -46,7 +47,11 @@ class DashboardController extends Controller
             ],
             'topRisky' => $topRisky,
             'recentActivity' => ActivityLog::with('user')->latest()->limit(6)->get(),
-            'newestWebsites' => Website::latest()->limit(5)->get(),
+            'newestWebsites' => Website::query()
+                ->with(['scanResults' => fn ($query) => $query->latest('scan_date')->limit(1)])
+                ->latest()
+                ->limit(5)
+                ->get(),
             'threatNotifications' => Notification::whereIn('type', ['threat', 'warning'])->latest()->limit(5)->get(),
             'inProgressScans' => ScanResult::inProgress()->with('website')->latest()->limit(5)->get(),
         ]);

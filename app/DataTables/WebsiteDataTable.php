@@ -13,6 +13,7 @@ class WebsiteDataTable
     public function query(Request $request): Builder
     {
         return Website::query()
+            ->with(['scanResults' => fn ($query) => $query->latest('scan_date')->limit(1)])
             ->when(
                 $request->query('status'),
                 fn (Builder $query, string $status) => $query->where('status', $status),
@@ -24,6 +25,7 @@ class WebsiteDataTable
         $user = auth()->user();
 
         return DataTables::eloquent($this->query($request))
+            ->addColumn('screenshot_url', fn (Website $website) => $website->scanResults->first()?->screenshotUrl())
             ->addColumn('badge', fn (Website $website) => [
                 'color' => $website->statusColor(),
                 'label' => $website->statusLabel(),
