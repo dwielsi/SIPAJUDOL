@@ -86,7 +86,7 @@
         <tr>
             <td class="label">Perihal</td>
             <td class="colon">:</td>
-            <td><strong>Pemberitahuan Hasil Pemeriksaan Indikasi Konten Judi Online{{ $report->scanResult?->website ? ' pada Website '.($report->scanResult->website->opd_name ?? $report->scanResult->website->website_name) : '' }}</strong></td>
+            <td><strong>Pemberitahuan Hasil Pemeriksaan Indikasi Konten Ilegal{{ $report->scanResult?->website ? ' pada Website '.($report->scanResult->website->opd_name ?? $report->scanResult->website->website_name) : '' }}</strong></td>
             <td></td>
         </tr>
     </table>
@@ -108,7 +108,7 @@
         @else
             ,
         @endif
-        ditemukan indikasi keberadaan konten dan/atau tautan yang mengarah ke situs judi online sebagaimana diuraikan pada laporan Nomor {{ $report->report_number }} berikut ini.
+        ditemukan indikasi keberadaan konten dan/atau tautan yang mengarah ke konten ilegal sebagaimana diuraikan pada laporan Nomor {{ $report->report_number }} berikut ini.
     </p>
 
     @if ($report->scanResult)
@@ -117,7 +117,7 @@
             <tr><th style="width: 30%;">Skor Risiko</th><td>{{ $report->scanResult->risk_score }} / 100</td></tr>
             <tr><th>Jenis Ancaman</th><td>{{ $report->scanResult->threat_type ?: '-' }}</td></tr>
             <tr><th>Jumlah Kata Kunci Terdeteksi</th><td>{{ $report->scanResult->keyword_count }}</td></tr>
-            <tr><th>Jumlah Tautan Judi Online</th><td>{{ $report->scanResult->judol_link_count }}</td></tr>
+            <tr><th>Jumlah Tautan Konten Ilegal</th><td>{{ $report->scanResult->judol_link_count }}</td></tr>
             <tr><th>Halaman Terindikasi</th><td>{{ $report->scanResult->infected_pages }}</td></tr>
         </table>
 

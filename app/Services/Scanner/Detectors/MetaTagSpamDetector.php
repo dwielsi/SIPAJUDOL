@@ -46,7 +46,7 @@ class MetaTagSpamDetector implements DetectorInterface
                 $findings[] = new Finding(
                     category: 'meta_tag_spam',
                     severity: 'high',
-                    message: "Meta tag \"{$meta['name']}\" mengandung kata kunci judi online",
+                    message: "Meta tag \"{$meta['name']}\" mengandung kata kunci konten ilegal",
                     evidence: Str::limit($meta['content'], 200),
                     pageUrl: $page->url,
                 );

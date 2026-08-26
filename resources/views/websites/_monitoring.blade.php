@@ -9,19 +9,8 @@
                     $cardData = $hasActiveScan
                         ? "scanProgress('" . route('scan-results.status', $latestScan) . "', { scan_state: '{$latestScan->scan_state}', progress_percent: {$latestScan->progress_percent} })"
                         : "{ isActive: () => false, percent: 0, step: '' }";
-                    $screenshotUrl = $latestScan?->screenshotUrl();
                 @endphp
                 <x-card x-data="{{ $cardData }}" :padding="false">
-                    @if ($screenshotUrl)
-                        <a href="{{ route('websites.show', $website) }}">
-                            <img src="{{ $screenshotUrl }}" alt="Screenshot {{ $website->website_name }}"
-                                 class="h-32 w-full rounded-t-xl border-b border-slate-200 object-cover object-top dark:border-slate-800">
-                        </a>
-                    @else
-                        <div class="flex h-32 w-full items-center justify-center rounded-t-xl border-b border-slate-200 bg-slate-50 text-xs text-slate-400 dark:border-slate-800 dark:bg-slate-800/50">
-                            Belum ada screenshot
-                        </div>
-                    @endif
                     <div class="p-4">
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
@@ -64,6 +53,50 @@
                                     <button type="submit" class="w-full rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-700">Scan Sekarang</button>
                                 </form>
                             </template>
+                        @endcan
+                        @can('delete', $website)
+                            <div x-data="{
+                                    deleting: false,
+                                    async destroyWebsite() {
+                                        const result = await Swal.fire({
+                                            title: 'Hapus website ini?',
+                                            text: '{{ addslashes($website->website_name) }} akan dipindahkan ke arsip.',
+                                            icon: 'warning',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'Ya, hapus',
+                                            cancelButtonText: 'Batal',
+                                            confirmButtonColor: '#EF4444',
+                                        });
+
+                                        if (!result.isConfirmed) return;
+
+                                        this.deleting = true;
+
+                                        const res = await fetch('{{ route('websites.destroy', $website) }}', {
+                                            method: 'POST',
+                                            headers: {
+                                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                                                'X-Requested-With': 'XMLHttpRequest',
+                                                'Accept': 'application/json',
+                                            },
+                                            body: (() => { const fd = new FormData(); fd.append('_method', 'DELETE'); return fd; })(),
+                                        });
+
+                                        if (res.ok) {
+                                            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Website berhasil dihapus', showConfirmButton: false, timer: 3000 });
+                                            window.location.reload();
+                                        } else {
+                                            this.deleting = false;
+                                            Swal.fire({ toast: true, position: 'top-end', icon: 'error', title: 'Gagal menghapus website', showConfirmButton: false, timer: 3000 });
+                                        }
+                                    },
+                                 }">
+                                <button type="button" @click="destroyWebsite()" :disabled="deleting"
+                                        class="rounded-lg border border-slate-300 p-1.5 text-slate-400 hover:border-danger-300 hover:bg-danger-50 hover:text-danger-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:hover:bg-danger-500/10"
+                                        title="Hapus website">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14Z"/></svg>
+                                </button>
+                            </div>
                         @endcan
                     </div>
                     </div>

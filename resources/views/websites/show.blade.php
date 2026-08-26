@@ -68,13 +68,14 @@
     </x-card>
 
     @if ($website->scanResults->isNotEmpty())
-        <x-card class="mt-5 max-w-4xl"
-                x-data="riskTrendChart({
+        <x-card class="mt-5 max-w-4xl">
+            <div x-data="riskTrendChart({
                     labels: @js($website->scanResults->sortBy('scan_date')->pluck('scan_date')->map(fn ($d) => $d->translatedFormat('d M'))->values()),
                     scores: @js($website->scanResults->sortBy('scan_date')->pluck('risk_score')->values()),
                 })">
-            <h2 class="mb-3 font-heading text-sm font-semibold text-slate-900 dark:text-white">Grafik Ancaman (Skor Risiko)</h2>
-            <div class="h-56"><canvas x-ref="riskTrendChart"></canvas></div>
+                <h2 class="mb-3 font-heading text-sm font-semibold text-slate-900 dark:text-white">Grafik Ancaman (Skor Risiko)</h2>
+                <div class="h-56"><canvas x-ref="riskTrendChart"></canvas></div>
+            </div>
         </x-card>
     @endif
 
@@ -93,7 +94,7 @@
                             <th class="px-4 py-3">Tanggal Pemindaian</th>
                             <th class="px-4 py-3">Status</th>
                             <th class="px-4 py-3">Skor Risiko</th>
-                            <th class="px-4 py-3">Tautan Judol</th>
+                            <th class="px-4 py-3">Tautan Konten Ilegal</th>
                             <th class="px-4 py-3 text-right">Laporan</th>
                         </tr>
                     </thead>

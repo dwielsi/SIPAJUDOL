@@ -18,7 +18,7 @@ return [
             'max' => 20,
         ],
         'judol_link_count' => [
-            'label' => 'Jumlah Link Judi Online',
+            'label' => 'Jumlah Link Konten Ilegal',
             'weight' => 0.25,
             'type' => 'benefit',
             'max' => 50,

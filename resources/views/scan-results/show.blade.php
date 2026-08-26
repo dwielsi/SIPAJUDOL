@@ -60,7 +60,7 @@
         <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             @foreach ([
                 'Keyword' => $scanResult->keyword_count,
-                'Link Judol' => $scanResult->judol_link_count,
+                'Link Konten Ilegal' => $scanResult->judol_link_count,
                 'Redirect' => $scanResult->redirect_count,
                 'Malware' => $scanResult->malware_count,
                 'Link Eksternal' => $scanResult->external_link_count,
@@ -84,11 +84,11 @@
                         >
                     </a>
                 @elseif ($scanResult->scan_state === 'completed')
-                    <div class="flex h-48 items-center justify-center rounded-xl border border-dashed border-slate-300 text-center text-sm text-slate-400 dark:border-slate-700">
+                    <div class="flex h-64 items-center justify-center rounded-xl border border-dashed border-slate-300 text-center text-sm text-slate-400 dark:border-slate-700">
                         Tangkapan layar tidak tersedia untuk pemindaian ini.
                     </div>
                 @else
-                    <div class="flex h-48 items-center justify-center rounded-xl border border-dashed border-slate-300 text-center text-sm text-slate-400 dark:border-slate-700">
+                    <div class="flex h-64 items-center justify-center rounded-xl border border-dashed border-slate-300 text-center text-sm text-slate-400 dark:border-slate-700">
                         Tangkapan layar akan tersedia setelah pemindaian selesai.
                     </div>
                 @endif
@@ -106,7 +106,7 @@
                     @if ($scanResult->keyword_count > 0)
                         <li>
                             <p class="text-xs text-slate-400">&mdash;</p>
-                            <p class="text-slate-700 dark:text-slate-200">Kata kunci judi online ditemukan</p>
+                            <p class="text-slate-700 dark:text-slate-200">Kata kunci konten ilegal ditemukan</p>
                         </li>
                     @endif
                     @if ($scanResult->redirect_count > 0)

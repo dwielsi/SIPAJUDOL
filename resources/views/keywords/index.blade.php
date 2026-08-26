@@ -16,7 +16,7 @@
 
     <x-card :padding="false">
         @if ($keywords->isEmpty())
-            <x-empty-state title="Belum ada kata kunci" description="Tambahkan kata kunci judi online untuk digunakan mesin pemindai." />
+            <x-empty-state title="Belum ada kata kunci" description="Tambahkan kata kunci konten ilegal untuk digunakan mesin pemindai." />
         @else
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">

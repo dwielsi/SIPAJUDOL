@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between gap-4">
             <div>
                 <h1 class="truncate font-heading text-base font-semibold text-slate-900 dark:text-white">Laporan</h1>
-                <p class="text-xs text-slate-400">Laporan hasil pemeriksaan indikasi konten judi online</p>
+                <p class="text-xs text-slate-400">Laporan hasil pemeriksaan indikasi konten ilegal</p>
             </div>
         </div>
     </x-slot>

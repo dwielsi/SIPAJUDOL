@@ -28,7 +28,7 @@ class ScreenshotService
                 ->noSandbox()
                 ->ignoreHttpsErrors()
                 ->setOption('args', ['--disable-gpu'])
-                ->fullPage();
+                ->setOption('waitUntil', 'domcontentloaded');
 
             if (! empty($this->config['node_binary'])) {
                 $browsershot->setNodeBinary($this->config['node_binary']);

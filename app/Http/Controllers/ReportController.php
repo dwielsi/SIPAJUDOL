@@ -69,7 +69,7 @@ class ReportController extends Controller
 
         return view('reports.edit', [
             'report' => $report,
-            'scanResults' => $this->scanResultOptions(),
+            'scanResults' => $this->scanResultOptions($report->scan_result_id),
         ]);
     }
 
@@ -143,11 +143,23 @@ class ReportController extends Controller
             ->with('success', 'Laporan berhasil dikirim ke '.$request->input('email').'.');
     }
 
-    private function scanResultOptions()
+    private function scanResultOptions(?int $includeScanResultId = null)
     {
-        return ScanResult::query()
+        $scanResults = ScanResult::query()
             ->with('website')
             ->latest('scan_date')
-            ->get();
+            ->get()
+            ->unique('website_id')
+            ->values();
+
+        if ($includeScanResultId && $scanResults->doesntContain('id', $includeScanResultId)) {
+            $current = ScanResult::query()->with('website')->find($includeScanResultId);
+
+            if ($current) {
+                $scanResults->push($current);
+            }
+        }
+
+        return $scanResults;
     }
 }

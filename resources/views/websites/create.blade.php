@@ -6,7 +6,7 @@
     <x-card class="max-w-2xl">
         <p class="mb-5 text-sm text-slate-500 dark:text-slate-400">
             Masukkan nama instansi/OPD dan domain website. Sistem akan langsung melakukan analisis otomatis
-            untuk memeriksa apakah website terindikasi judi online.
+            untuk memeriksa apakah website terindikasi konten ilegal.
         </p>
 
         <form method="POST" action="{{ route('websites.store') }}">

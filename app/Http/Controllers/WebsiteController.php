@@ -66,7 +66,7 @@ class WebsiteController extends Controller
         ScanWebsiteJob::dispatch($website, $scanResult);
 
         return redirect()->route('scan-results.show', $scanResult)
-            ->with('success', "Website {$website->domain} berhasil ditambahkan. Analisis otomatis sedang berjalan untuk memeriksa indikasi judi online.");
+            ->with('success', "Website {$website->domain} berhasil ditambahkan. Analisis otomatis sedang berjalan untuk memeriksa indikasi konten ilegal.");
     }
 
     public function show(Website $website): View

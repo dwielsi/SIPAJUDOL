@@ -16,7 +16,7 @@ class KeywordJudolDetector implements DetectorInterface
 
     public function label(): string
     {
-        return 'Keyword Judi Online';
+        return 'Keyword Konten Ilegal';
     }
 
     public function detect(PageContent $page, Website $website): array
@@ -33,7 +33,7 @@ class KeywordJudolDetector implements DetectorInterface
                 $findings[] = new Finding(
                     category: 'keyword_judol',
                     severity: $count >= 3 ? 'high' : 'medium',
-                    message: "Kata kunci judi online \"{$keyword}\" ditemukan {$count}x",
+                    message: "Kata kunci konten ilegal \"{$keyword}\" ditemukan {$count}x",
                     evidence: $keyword,
                     pageUrl: $page->url,
                 );

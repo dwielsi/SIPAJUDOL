@@ -26,7 +26,7 @@ class ReportMail extends Mailable
         $instansi = Setting::first()?->instansi_name ?: config('app.name');
 
         return new Envelope(
-            subject: "Laporan Temuan Indikasi Judi Online - {$this->report->report_number} - {$instansi}",
+            subject: "Laporan Temuan Indikasi Konten Ilegal - {$this->report->report_number} - {$instansi}",
         );
     }
 

@@ -12,13 +12,13 @@ class ScanFindingSeeder extends Seeder
     public function run(): void
     {
         $this->seedFor('dinsos.kuburayakab.go.id', [
-            ['category' => 'Konten Tersisipi', 'severity' => 'critical', 'message' => 'Ditemukan teks promosi judi online pada halaman beranda.', 'evidence' => 'https://dinsos.kuburayakab.go.id/index.php?slot=xyz123'],
-            ['category' => 'Tautan Mencurigakan', 'severity' => 'high', 'message' => 'Terdapat 6 tautan keluar menuju domain judi online yang dikenal.', 'evidence' => 'situs-judol-abc.example'],
+            ['category' => 'Konten Tersisipi', 'severity' => 'critical', 'message' => 'Ditemukan teks promosi konten ilegal pada halaman beranda.', 'evidence' => 'https://dinsos.kuburayakab.go.id/index.php?slot=xyz123'],
+            ['category' => 'Tautan Mencurigakan', 'severity' => 'high', 'message' => 'Terdapat 6 tautan keluar menuju domain konten ilegal yang dikenal.', 'evidence' => 'situs-konten-ilegal-abc.example'],
             ['category' => 'Halaman Tersembunyi', 'severity' => 'medium', 'message' => 'Ditemukan halaman baru yang tidak terdaftar di sitemap resmi.', 'evidence' => '/wp-content/uploads/2026/promo-slot/'],
         ]);
 
         $this->seedFor('disdikbud.kuburayakab.go.id', [
-            ['category' => 'Komentar Pengunjung', 'severity' => 'low', 'message' => 'Kata kunci terkait judi online muncul pada kolom komentar berita.', 'evidence' => 'Komentar pada artikel ID #482'],
+            ['category' => 'Komentar Pengunjung', 'severity' => 'low', 'message' => 'Kata kunci terkait konten ilegal muncul pada kolom komentar berita.', 'evidence' => 'Komentar pada artikel ID #482'],
         ]);
     }
 

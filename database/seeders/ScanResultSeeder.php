@@ -16,11 +16,11 @@ class ScanResultSeeder extends Seeder
                 'scan_date' => now()->subDays(2),
                 'status' => 'flagged',
                 'risk_score' => 87,
-                'threat_type' => 'Judi Online',
+                'threat_type' => 'Konten Ilegal',
                 'keyword_count' => 14,
                 'judol_link_count' => 6,
                 'infected_pages' => 3,
-                'findings_summary' => 'Ditemukan sisipan konten dan tautan yang mengarah ke situs judi online pada beberapa halaman.',
+                'findings_summary' => 'Ditemukan sisipan konten dan tautan yang mengarah ke konten ilegal pada beberapa halaman.',
                 'notes' => 'Perlu tindak lanjut segera oleh admin website.',
             ],
             [
