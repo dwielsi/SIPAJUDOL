@@ -1,4 +1,4 @@
-@props(['label', 'value', 'color' => 'primary', 'icon' => null, 'href' => null])
+@props(['label', 'value', 'color' => 'primary', 'icon' => null, 'href' => null, 'dark' => false])
 
 @php
     $colors = [
@@ -8,6 +8,8 @@
         'danger' => 'bg-danger-50 text-danger-600 dark:bg-danger-500/10 dark:text-danger-500',
         'purple' => 'bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400',
         'cyan' => 'bg-cyan-50 text-cyan-600 dark:bg-cyan-500/10 dark:text-cyan-400',
+        'teal' => 'bg-teal-50 text-teal-600 dark:bg-teal-500/10 dark:text-teal-400',
+        'gold' => 'bg-gold-50 text-gold-600 dark:bg-gold-500/10 dark:text-gold-500',
     ];
 
     $sweepColors = [
@@ -17,6 +19,8 @@
         'danger' => 'bg-danger-600',
         'purple' => 'bg-purple-600',
         'cyan' => 'bg-cyan-600',
+        'teal' => 'bg-teal-500',
+        'gold' => 'bg-gold-500',
     ];
 
     $borderHoverColors = [
@@ -26,10 +30,20 @@
         'danger' => 'group-hover:border-danger-600',
         'purple' => 'group-hover:border-purple-600',
         'cyan' => 'group-hover:border-cyan-600',
+        'teal' => 'group-hover:border-teal-500',
+        'gold' => 'group-hover:border-gold-500',
     ];
 @endphp
 
-@if ($href)
+@if ($dark)
+    @if ($href)
+        <a href="{{ $href }}" class="block rounded-2xl transition hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+            @include('components._stat-card-dark-inner')
+        </a>
+    @else
+        @include('components._stat-card-dark-inner')
+    @endif
+@elseif ($href)
     <a href="{{ $href }}" class="group block rounded-2xl transition hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
         <x-card class="relative overflow-hidden transition-colors {{ $borderHoverColors[$color] ?? $borderHoverColors['primary'] }}">
             <span class="pointer-events-none absolute inset-0 -translate-x-full {{ $sweepColors[$color] ?? $sweepColors['primary'] }} transition-transform duration-300 ease-out group-hover:translate-x-0"></span>

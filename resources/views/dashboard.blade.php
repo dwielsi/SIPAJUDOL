@@ -3,7 +3,7 @@
         <h1 class="truncate font-heading text-base font-semibold text-slate-900 dark:text-white">Dashboard</h1>
     </x-slot>
 
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
         <x-stat-card
             label="Total Website"
             :value="$totalWebsites"
@@ -35,14 +35,14 @@
         <x-stat-card
             label="Sedang Scan"
             :value="$scanningCount"
-            color="purple"
+            color="teal"
             :href="route('scan-results.index', ['state' => 'in_progress'])"
             icon='<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>'
         />
         <x-stat-card
             label="Total Laporan"
             :value="$totalReports"
-            color="cyan"
+            dark
             :href="route('reports.index')"
             icon='<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6M9 9h1"/></svg>'
         />

@@ -16,7 +16,7 @@
         {{ $head ?? '' }}
     </head>
     <body class="font-sans antialiased">
-        <div x-data="{ mobileOpen: false }" class="flex min-h-screen bg-surface dark:bg-slate-900">
+        <div x-data="{ mobileOpen: false }" class="flex min-h-screen flex-col gap-4 bg-surface p-3 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-900 dark:to-navy-900 sm:gap-6 sm:p-4 lg:flex-row lg:p-6">
 
             <!-- Mobile overlay -->
             <div x-show="mobileOpen"
@@ -31,21 +31,21 @@
             <aside
                 x-cloak
                 :class="[mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0', $store.sidebar.collapsed ? 'lg:w-20' : 'lg:w-64']"
-                class="sidebar-cloak fixed inset-y-0 left-0 z-50 flex w-64 transform flex-col border-r border-slate-200 bg-white transition-all duration-200 ease-in-out lg:sticky lg:top-0 lg:z-auto lg:h-screen dark:border-slate-800 dark:bg-slate-800/60">
+                class="sidebar-cloak fixed inset-y-0 left-0 z-50 flex w-64 transform flex-col rounded-r-3xl bg-gradient-to-b from-navy-900 via-navy-900 to-navy-500 text-slate-100 shadow-2xl shadow-navy-900/30 transition-all duration-200 ease-in-out lg:sticky lg:inset-y-auto lg:left-auto lg:top-6 lg:z-auto lg:h-[calc(100vh-3rem)] lg:rounded-3xl">
 
-                <div class="flex h-16 shrink-0 items-center gap-3 border-b border-slate-200 px-4 dark:border-slate-800">
-                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-600 text-white">
+                <div class="flex h-16 shrink-0 items-center gap-3 px-5">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-teal-500 text-white shadow-lg shadow-teal-500/30">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
                         </svg>
                     </div>
-                    <span class="font-heading text-sm font-semibold text-slate-900 dark:text-white" :class="$store.sidebar.collapsed && 'lg:hidden'">SIDEPSIL</span>
+                    <span class="font-heading text-base font-semibold text-white" :class="$store.sidebar.collapsed && 'lg:hidden'">SIDEPSIL</span>
                 </div>
 
                 @include('layouts.partials.sidebar-nav')
 
-                <div class="border-t border-slate-200 p-3 dark:border-slate-800">
-                    <button @click="$store.sidebar.toggle()" class="hidden w-full items-center justify-center rounded-lg py-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 lg:flex dark:hover:bg-slate-700 dark:hover:text-slate-200">
+                <div class="p-3">
+                    <button @click="$store.sidebar.toggle()" class="hidden w-full items-center justify-center rounded-xl py-2 text-slate-400 hover:bg-white/5 hover:text-white lg:flex">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform" :class="$store.sidebar.collapsed && 'rotate-180'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M11 19l-7-7 7-7M20 19l-7-7 7-7" />
                         </svg>
@@ -54,9 +54,9 @@
             </aside>
 
             <!-- Main column -->
-            <div class="flex min-w-0 flex-1 flex-col">
+            <div class="flex min-w-0 flex-1 flex-col gap-4 sm:gap-6">
                 <!-- Topbar -->
-                <header class="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-4 border-b border-slate-200 bg-white/80 px-4 backdrop-blur sm:px-6 dark:border-slate-800 dark:bg-slate-900/80">
+                <header class="sticky top-3 z-30 flex h-16 shrink-0 items-center gap-3 rounded-2xl bg-white px-4 shadow-card sm:top-6 sm:gap-4 sm:px-5 dark:bg-gradient-to-b dark:from-slate-700 dark:to-slate-900">
                     <button @click="mobileOpen = true" class="text-slate-500 hover:text-slate-700 lg:hidden dark:text-slate-400 dark:hover:text-slate-200">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M4 6h16M4 12h16M4 18h16" />
@@ -71,7 +71,12 @@
                         @endisset
                     </div>
 
-                    <button @click="$store.theme.toggle()" class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200">
+                    <label class="hidden w-64 shrink-0 items-center gap-2 rounded-xl bg-slate-100 px-3.5 py-2 text-slate-400 focus-within:ring-2 focus-within:ring-teal-500/40 md:flex dark:bg-slate-900/60">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+                        <input type="text" placeholder="Cari..." class="w-full border-0 bg-transparent p-0 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-0 dark:text-slate-200">
+                    </label>
+
+                    <button @click="$store.theme.toggle()" class="shrink-0 rounded-xl p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200">
                         <svg x-show="!$store.theme.dark" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
                         <svg x-show="$store.theme.dark" x-cloak xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
                     </button>
@@ -80,8 +85,8 @@
 
                     <x-dropdown align="right" width="56">
                         <x-slot name="trigger">
-                            <button class="flex items-center gap-2 rounded-lg py-1.5 pl-1.5 pr-2 hover:bg-slate-100 dark:hover:bg-slate-800">
-                                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-600 text-sm font-semibold text-white">
+                            <button class="flex shrink-0 items-center gap-2 rounded-xl py-1.5 pl-1.5 pr-2 hover:bg-slate-100 dark:hover:bg-slate-800">
+                                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-teal-500 text-sm font-semibold text-white">
                                     {{ Str::upper(Str::substr(auth()->user()->name, 0, 1)) }}
                                 </span>
                                 <span class="hidden text-left sm:block">
@@ -103,7 +108,7 @@
                     </x-dropdown>
                 </header>
 
-                <main class="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+                <main class="flex-1">
                     {{ $slot }}
                 </main>
             </div>

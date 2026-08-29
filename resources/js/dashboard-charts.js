@@ -19,10 +19,14 @@ export default function dashboardCharts({ monthly, riskLevels, statusCounts }) {
                     datasets: [{
                         label: 'Jumlah Scan',
                         data: monthly.map((m) => m.count),
-                        borderColor: '#2563EB',
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderColor: '#24B9AD',
+                        backgroundColor: 'rgba(36, 185, 173, 0.12)',
+                        pointBackgroundColor: '#24B9AD',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
                         fill: true,
-                        tension: 0.35,
+                        tension: 0.4,
                     }],
                 },
                 options: baseOptions(),
@@ -34,11 +38,12 @@ export default function dashboardCharts({ monthly, riskLevels, statusCounts }) {
                     labels: ['Aman', 'Perlu Pemeriksaan', 'Terindikasi'],
                     datasets: [{
                         data: [statusCounts.safe, statusCounts.needs_review, statusCounts.flagged],
-                        backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
+                        backgroundColor: ['#24B9AD', '#F3DA52', '#1A3A65'],
                         borderWidth: 0,
+                        hoverOffset: 4,
                     }],
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '68%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } } } },
             });
 
             new Chart(this.$refs.riskChart, {
@@ -48,8 +53,9 @@ export default function dashboardCharts({ monthly, riskLevels, statusCounts }) {
                     datasets: [{
                         label: 'Jumlah Website',
                         data: Object.values(riskLevels),
-                        backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
-                        borderRadius: 6,
+                        backgroundColor: ['#24B9AD', '#F3DA52', '#1A3A65'],
+                        borderRadius: 8,
+                        maxBarThickness: 36,
                     }],
                 },
                 options: baseOptions(),
