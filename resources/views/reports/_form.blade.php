@@ -6,8 +6,8 @@
 <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
     <div class="sm:col-span-2">
         <x-input-label for="scan_result_id" value="Hasil Pemindaian Terkait" />
-        <select id="scan_result_id" name="scan_result_id" class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white">
-            <option value="">Tanpa hasil pemindaian</option>
+        <select id="scan_result_id" name="scan_result_id" required class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white">
+            <option value="" disabled @selected(! $selected)>Pilih hasil pemindaian</option>
             @foreach ($scanResults as $scanResult)
                 <option
                     value="{{ $scanResult->id }}"

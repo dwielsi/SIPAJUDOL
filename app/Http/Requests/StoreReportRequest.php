@@ -25,7 +25,7 @@ class StoreReportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'scan_result_id' => ['nullable', 'exists:scan_results,id'],
+            'scan_result_id' => ['required', 'exists:scan_results,id'],
             'report_date' => ['required', 'date'],
             'analyst' => ['required', 'string', 'max:255'],
             'summary' => ['nullable', 'string'],
