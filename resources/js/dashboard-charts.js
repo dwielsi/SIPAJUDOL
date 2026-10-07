@@ -9,16 +9,31 @@ function baseOptions() {
     };
 }
 
-export default function dashboardCharts({ monthly, riskLevels, statusCounts }) {
+export default function dashboardCharts({ scanStats, riskLevels, statusCounts }) {
+    let scanChart = null;
+
     return {
+        period: 'monthly',
+        periodLabels: { weekly: 'Mingguan', monthly: 'Bulanan', yearly: 'Tahunan' },
+
+        setPeriod(period) {
+            this.period = period;
+            const series = scanStats[period];
+            scanChart.data.labels = series.map((m) => m.label);
+            scanChart.data.datasets[0].data = series.map((m) => m.count);
+            scanChart.update();
+        },
+
         init() {
-            new Chart(this.$refs.monthlyChart, {
+            const initial = scanStats[this.period];
+
+            scanChart = new Chart(this.$refs.scanChart, {
                 type: 'line',
                 data: {
-                    labels: monthly.map((m) => m.label),
+                    labels: initial.map((m) => m.label),
                     datasets: [{
                         label: 'Jumlah Scan',
-                        data: monthly.map((m) => m.count),
+                        data: initial.map((m) => m.count),
                         borderColor: '#24B9AD',
                         backgroundColor: 'rgba(36, 185, 173, 0.12)',
                         pointBackgroundColor: '#24B9AD',
@@ -53,7 +68,7 @@ export default function dashboardCharts({ monthly, riskLevels, statusCounts }) {
                     datasets: [{
                         label: 'Jumlah Website',
                         data: Object.values(riskLevels),
-                        backgroundColor: ['#24B9AD', '#F3DA52', '#1A3A65'],
+                        backgroundColor: ['#24B9AD', '#F3DA52', '#1A3A65', '#94A3B8'],
                         borderRadius: 8,
                         maxBarThickness: 36,
                     }],

@@ -12,6 +12,9 @@ class ScanProgressController extends Controller
     {
         Gate::authorize('view', $scanResult);
 
+        ScanResult::expireStale();
+        $scanResult->refresh();
+
         return response()->json([
             'scan_state' => $scanResult->scan_state,
             'progress_percent' => $scanResult->progress_percent,

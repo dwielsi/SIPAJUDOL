@@ -1,7 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between gap-4">
-            <h1 class="truncate font-heading text-base font-semibold text-slate-900 dark:text-white">Notifikasi</h1>
+            <div class="flex min-w-0 items-center gap-3">
+                <x-back-link :href="$backUrl" label="Kembali ke Halaman Sebelumnya" />
+                <h1 class="min-w-0 truncate font-heading text-base font-semibold text-slate-900 dark:text-white">Notifikasi</h1>
+            </div>
             <form method="POST" action="{{ route('notifications.read-all') }}">
                 @csrf
                 <x-button variant="secondary" type="submit">Tandai Semua Dibaca</x-button>
@@ -21,7 +24,7 @@
                             <div>
                                 <p class="text-sm font-medium text-slate-800 dark:text-slate-100">{{ $notification->title }}</p>
                                 <p class="mt-0.5 text-sm text-slate-500 dark:text-slate-400">{{ $notification->message }}</p>
-                                <p class="mt-1 text-xs text-slate-400">{{ $notification->created_at->diffForHumans() }}</p>
+                                <p class="mt-1 text-xs text-slate-400">{{ $notification->created_at->translatedFormat('d M Y H:i') }}</p>
                             </div>
                         </div>
                         @unless ($notification->is_read)

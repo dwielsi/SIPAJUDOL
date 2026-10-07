@@ -4,25 +4,43 @@ namespace App\Services\Scanner;
 
 use App\Services\Scanner\DTO\PageContent;
 use App\Services\Scanner\Support\HtmlDom;
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Throwable;
 
 class Crawler
 {
-    public function __construct(private readonly array $config) {}
+    private ?string $lastError = null;
+
+    /**
+     * @param  array  $strategy  strategi akses dari ScanRecoveryAdvisor; kosong berarti cara bawaan
+     *                           (https lalu http dengan user agent SIDEPSIL).
+     */
+    public function __construct(
+        private readonly array $config,
+        private readonly array $strategy = [],
+    ) {}
+
+    /**
+     * Pesan kesalahan terakhir saat mengambil halaman (mis. error koneksi/SSL/timeout).
+     */
+    public function lastError(): ?string
+    {
+        return $this->lastError;
+    }
 
     /**
      * @return PageContent[]
      */
     public function crawl(string $domain, ?callable $onPage = null): array
     {
-        $first = $this->fetch("https://{$domain}");
-        $scheme = 'https';
+        $first = null;
 
-        if (! $first) {
-            $first = $this->fetch("http://{$domain}");
-            $scheme = 'http';
+        foreach ($this->startUrls($domain) as $startUrl) {
+            if ($first = $this->fetch($startUrl)) {
+                break;
+            }
         }
 
         if (! $first) {
@@ -71,6 +89,56 @@ class Crawler
         return $pages;
     }
 
+    /**
+     * @return string[]
+     */
+    private function startUrls(string $domain): array
+    {
+        if ($this->strategy === []) {
+            return ["https://{$domain}", "http://{$domain}"];
+        }
+
+        $bare = preg_replace('/^www\./i', '', $domain);
+        $host = match ($this->strategy['host_variant'] ?? 'original') {
+            'www' => "www.{$bare}",
+            'non_www' => $bare,
+            default => $domain,
+        };
+
+        return [($this->strategy['scheme'] ?? 'https')."://{$host}".($this->strategy['path'] ?? '/')];
+    }
+
+    private function request(): PendingRequest
+    {
+        $options = [
+            'allow_redirects' => false,
+            'verify' => (bool) ($this->strategy['verify_ssl'] ?? true),
+        ];
+
+        if ($this->strategy['force_ipv4'] ?? false) {
+            $options['force_ip_resolve'] = 'v4';
+        }
+
+        if ($this->strategy['http_1_1'] ?? false) {
+            $options['version'] = '1.1';
+        }
+
+        $userAgent = ScanRecoveryAdvisor::USER_AGENTS[$this->strategy['user_agent'] ?? 'default'] ?? null;
+
+        $request = Http::withOptions($options)
+            ->withUserAgent($userAgent ?? $this->config['user_agent'] ?? 'SIDEPSIL-Scanner/1.0')
+            ->timeout((int) ($this->strategy['timeout'] ?? $this->config['timeout'] ?? 10));
+
+        if ($this->strategy['browser_headers'] ?? false) {
+            $request->withHeaders([
+                'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language' => 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7',
+            ]);
+        }
+
+        return $request;
+    }
+
     private function fetch(string $url): ?PageContent
     {
         $chain = [$url];
@@ -80,11 +148,10 @@ class Crawler
 
         for ($hop = 0; $hop < 5; $hop++) {
             try {
-                $response = Http::withOptions(['allow_redirects' => false])
-                    ->withUserAgent($this->config['user_agent'] ?? 'SIDEPSIL-Scanner/1.0')
-                    ->timeout((int) ($this->config['timeout'] ?? 10))
-                    ->get($current);
-            } catch (Throwable) {
+                $response = $this->request()->get($current);
+            } catch (Throwable $e) {
+                $this->lastError = Str::limit($e->getMessage(), 300);
+
                 return null;
             }
 

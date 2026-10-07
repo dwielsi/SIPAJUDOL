@@ -17,8 +17,7 @@
         <!-- Password -->
         <div class="mt-4">
             <x-input-label for="password" value="Password" />
-            <x-text-input id="password" class="block w-full"
-                            type="password"
+            <x-password-input id="password" class="block w-full"
                             name="password"
                             required autocomplete="current-password" />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
@@ -40,5 +39,10 @@
         <x-button type="submit" variant="primary" class="mt-6 w-full">
             Masuk
         </x-button>
+
+        <p class="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
+            Belum ada akun admin?
+            <a class="text-primary-600 hover:text-primary-700 hover:underline" href="{{ route('register') }}">Daftar akun admin pertama</a>
+        </p>
     </form>
 </x-guest-layout>

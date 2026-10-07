@@ -11,13 +11,14 @@ class ActivityLogDataTable
 {
     public function query(): Builder
     {
-        return ActivityLog::query()->with('user')->latest();
+        return ActivityLog::query()->with('user')->latest('id');
     }
 
     public function ajax(): JsonResponse
     {
         return DataTables::eloquent($this->query())
             ->addColumn('user_name', fn (ActivityLog $log) => $log->user?->name ?? 'Sistem')
+            ->addColumn('action_label', fn (ActivityLog $log) => $log->actionLabel())
             ->addColumn('created_at_label', fn (ActivityLog $log) => $log->created_at->translatedFormat('d M Y H:i'))
             ->make(true);
     }

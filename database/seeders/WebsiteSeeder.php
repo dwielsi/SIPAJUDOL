@@ -20,6 +20,7 @@ class WebsiteSeeder extends Seeder
             ['opd_name' => 'Dinas Perhubungan', 'website_name' => 'Website Dishub', 'domain' => 'dishub.kuburayakab.go.id', 'status' => 'safe'],
             ['opd_name' => 'Dinas Perpustakaan dan Kearsipan', 'website_name' => 'Website Perpustakaan Daerah', 'domain' => 'perpustakaan.kuburayakab.go.id', 'status' => 'needs_review'],
             ['opd_name' => 'Badan Kepegawaian dan Pengembangan SDM', 'website_name' => 'Website BKPSDM', 'domain' => 'bkpsdm.kuburayakab.go.id', 'status' => 'safe'],
+            ['opd_name' => 'Dinas Lingkungan Hidup', 'website_name' => 'Website DLH', 'domain' => 'dlh.kuburayakab.go.id', 'status' => 'safe'],
         ];
 
         foreach ($fixtures as $fixture) {

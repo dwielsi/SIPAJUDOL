@@ -1,37 +1,37 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between gap-4">
-            <div>
-                <h1 class="truncate font-heading text-base font-semibold text-slate-900 dark:text-white">Website</h1>
-                <p class="text-xs text-slate-400">Monitoring, master data, dan riwayat pemindaian website OPD</p>
-            </div>
-
-            @can('create', \App\Models\ScanResult::class)
-                <form method="POST" action="{{ route('scan-results.scan-all') }}" x-data
-                      @submit.prevent="Swal.fire({
-                          title: 'Scan semua website sekarang?',
-                          text: 'Pemindaian akan dijalankan untuk semua website yang sedang tidak diproses.',
-                          icon: 'question',
-                          showCancelButton: true,
-                          confirmButtonText: 'Ya, scan semua',
-                          cancelButtonText: 'Batal',
-                          confirmButtonColor: '#2563EB',
-                      }).then((result) => { if (result.isConfirmed) { $el.submit(); } })">
-                    @csrf
-                    <x-button type="submit" variant="secondary">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.36M21 12a9 9 0 0 1-15.5 6.36"/><path d="M18 3v5h-5M6 21v-5h5"/></svg>
-                        Scan Semua Website
-                    </x-button>
-                </form>
-            @endcan
+        <div class="min-w-0">
+            <h1 class="truncate font-heading text-base font-semibold text-slate-900 dark:text-white">Website</h1>
+            <p class="truncate text-xs text-slate-400">Monitoring, master data, dan riwayat pemindaian website OPD</p>
         </div>
     </x-slot>
+
+    @can('create', \App\Models\ScanResult::class)
+        <x-slot name="headerAction">
+            <form method="POST" action="{{ route('scan-results.scan-all') }}" x-data
+                  @submit.prevent="Swal.fire({
+                      title: 'Scan semua website sekarang?',
+                      text: 'Pemindaian akan dijalankan untuk semua website yang sedang tidak diproses.',
+                      icon: 'question',
+                      showCancelButton: true,
+                      confirmButtonText: 'Ya, scan semua',
+                      cancelButtonText: 'Batal',
+                      confirmButtonColor: '#2563EB',
+                  }).then((result) => { if (result.isConfirmed) { $el.submit(); } })">
+                @csrf
+                <x-button type="submit" variant="secondary" class="w-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.36M21 12a9 9 0 0 1-15.5 6.36"/><path d="M18 3v5h-5M6 21v-5h5"/></svg>
+                    Scan Semua Website
+                </x-button>
+            </form>
+        </x-slot>
+    @endcan
 
     @php
         $initialTab = in_array(request('tab'), ['monitoring', 'daftar', 'riwayat'], true) ? request('tab') : 'monitoring';
     @endphp
 
-    <div x-data="{ tab: '{{ $initialTab }}' }" class="space-y-4">
+    <div x-data="{ tab: '{{ $initialTab }}' }" x-init="$store.websiteTab.current = tab; $watch('tab', value => { $store.websiteTab.current = value; const url = new URL(window.location); url.searchParams.set('tab', value); history.replaceState(history.state, '', url); })" class="space-y-4">
         <div class="inline-flex flex-wrap items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-100 p-1.5 dark:border-slate-700 dark:bg-slate-800/60">
             @can('monitoring.view')
                 <button type="button" @click="tab = 'monitoring'"

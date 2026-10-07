@@ -6,6 +6,7 @@ use App\Models\Report;
 use App\Models\ScanResult;
 use App\Models\Setting;
 use App\Repositories\Contracts\ReportRepositoryInterface;
+use App\Services\Scanner\AiAnalysisService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 
@@ -86,16 +87,12 @@ class ReportService
             return $data;
         }
 
-        if ($needsSummary && $scanResult->ai_summary) {
-            $data['summary'] = $scanResult->ai_summary;
-        }
+        $narrative = app(AiAnalysisService::class)->narrativeFor($scanResult);
 
-        if ($needsConclusion && $scanResult->ai_conclusion) {
-            $data['conclusion'] = $scanResult->ai_conclusion;
-        }
-
-        if ($needsRecommendation && $scanResult->ai_recommendation) {
-            $data['recommendation'] = $scanResult->ai_recommendation;
+        foreach (['summary' => $needsSummary, 'conclusion' => $needsConclusion, 'recommendation' => $needsRecommendation] as $key => $needed) {
+            if ($needed) {
+                $data[$key] = $narrative[$key];
+            }
         }
 
         return $data;

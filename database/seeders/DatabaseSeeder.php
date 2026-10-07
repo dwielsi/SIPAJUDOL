@@ -18,7 +18,6 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             UserSeeder::class,
             SettingSeeder::class,
-            KeywordSeeder::class,
             WebsiteSeeder::class,
             ScanResultSeeder::class,
             ScanFindingSeeder::class,

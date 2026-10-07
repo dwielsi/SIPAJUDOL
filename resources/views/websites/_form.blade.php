@@ -60,7 +60,7 @@
     <div>
         <x-input-label for="status" value="Status" />
         <select id="status" name="status" class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white">
-            @foreach (['safe' => 'Aman', 'needs_review' => 'Perlu Pemeriksaan', 'flagged' => 'Terindikasi'] as $value => $label)
+            @foreach (['safe' => 'Aman', 'needs_review' => 'Perlu Pemeriksaan', 'flagged' => 'Terindikasi', 'scan_failed' => 'Gagal Dipindai'] as $value => $label)
                 <option value="{{ $value }}" @selected(old('status', $website?->status ?? 'safe') === $value)>{{ $label }}</option>
             @endforeach
         </select>

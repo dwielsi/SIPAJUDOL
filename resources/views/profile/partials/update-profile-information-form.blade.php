@@ -25,8 +25,14 @@
 
         <div>
             <x-input-label for="email" value="Email" />
-            <x-text-input id="email" name="email" type="email" class="block w-full" :value="old('email', $user->email)" required autocomplete="username" />
+            <x-text-input id="email" name="email" type="email" class="block w-full" placeholder="nama@gmail.com" :value="old('email', $user->email)" autocomplete="username" />
             <x-input-error class="mt-2" :messages="$errors->get('email')" />
+
+            @if (! filter_var($user->email, FILTER_VALIDATE_EMAIL))
+                <p class="mt-2 text-sm text-amber-600 dark:text-amber-500">
+                    Anda belum mengisi email. Isi email yang aktif agar Anda bisa menerima tautan reset password saat lupa password.
+                </p>
+            @endif
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <div>
@@ -47,9 +53,7 @@
             @endif
         </div>
 
-        <div class="flex items-center gap-4">
-            <x-button type="submit" variant="primary">Simpan</x-button>
-
+        <div class="flex items-center justify-end gap-4">
             @if (session('status') === 'profile-updated')
                 <p
                     x-data="{ show: true }"
@@ -59,6 +63,11 @@
                     class="text-sm text-slate-500 dark:text-slate-400"
                 >Tersimpan.</p>
             @endif
+
+            <x-button type="submit" variant="primary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                Simpan
+            </x-button>
         </div>
     </form>
 </section>

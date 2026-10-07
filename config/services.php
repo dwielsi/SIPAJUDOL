@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'sumopod' => [
+        'base_url' => env('SUMOPOD_BASE_URL', 'https://ai.sumopod.com/v1'),
+        'api_key' => env('SUMOPOD_API_KEY'),
+        'model' => env('SUMOPOD_MODEL', 'gpt-4o-mini'),
+        'timeout' => env('SUMOPOD_TIMEOUT', 60),
+    ],
+
 ];

@@ -14,7 +14,7 @@ class SpkController extends Controller
         Gate::authorize('spk.view');
 
         $websites = Website::query()
-            ->with(['scanResults' => fn ($query) => $query->latest('scan_date')->limit(1)])
+            ->with(['scanResults' => fn ($query) => $query->latest('scan_date')->orderByDesc('id')->limit(1)])
             ->orderBy('website_name')
             ->get();
 

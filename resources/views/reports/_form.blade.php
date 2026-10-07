@@ -9,12 +9,15 @@
         <select id="scan_result_id" name="scan_result_id" required class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white">
             <option value="" disabled @selected(! $selected)>Pilih hasil pemindaian</option>
             @foreach ($scanResults as $scanResult)
+                @php
+                    $narrative = app(\App\Services\Scanner\AiAnalysisService::class)->narrativeFor($scanResult);
+                @endphp
                 <option
                     value="{{ $scanResult->id }}"
                     @selected((string) $selected === (string) $scanResult->id)
-                    data-summary="{{ $scanResult->ai_summary }}"
-                    data-conclusion="{{ $scanResult->ai_conclusion }}"
-                    data-recommendation="{{ $scanResult->ai_recommendation }}"
+                    data-summary="{{ $narrative['summary'] }}"
+                    data-conclusion="{{ $narrative['conclusion'] }}"
+                    data-recommendation="{{ $narrative['recommendation'] }}"
                 >
                     {{ $scanResult->website->website_name ?? 'Website tidak diketahui' }} &mdash; {{ $scanResult->scan_date->translatedFormat('d M Y') }} ({{ $scanResult->threat_type ?: $scanResult->status }})
                 </option>
@@ -79,6 +82,10 @@
                 return;
             }
 
+            // Nilai terakhir yang diisi otomatis; kolom yang belum diubah pengguna ikut
+            // berganti saat hasil pemindaian lain dipilih.
+            const autoFilled = {};
+
             const fillFromSelectedOption = () => {
                 const option = select.options[select.selectedIndex];
 
@@ -86,15 +93,18 @@
                     return;
                 }
 
-                if (fields.summary && ! fields.summary.value.trim()) {
-                    fields.summary.value = option.dataset.summary || '';
-                }
-                if (fields.conclusion && ! fields.conclusion.value.trim()) {
-                    fields.conclusion.value = option.dataset.conclusion || '';
-                }
-                if (fields.recommendation && ! fields.recommendation.value.trim()) {
-                    fields.recommendation.value = option.dataset.recommendation || '';
-                }
+                Object.entries(fields).forEach(([key, field]) => {
+                    if (! field) {
+                        return;
+                    }
+
+                    const current = field.value.trim();
+
+                    if (current === '' || current === (autoFilled[key] ?? '').trim()) {
+                        field.value = option.dataset[key] || '';
+                        autoFilled[key] = field.value;
+                    }
+                });
             };
 
             select.addEventListener('change', fillFromSelectedOption);

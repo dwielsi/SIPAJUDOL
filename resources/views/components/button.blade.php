@@ -9,6 +9,6 @@
     ];
 @endphp
 
-<button type="{{ $type }}" {{ $attributes->merge(['class' => 'inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ' . $variants[$variant]]) }}>
+<button type="{{ $type }}" {{ $attributes->merge(['class' => 'inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ' . $variants[$variant]]) }}>
     {{ $slot }}
 </button>

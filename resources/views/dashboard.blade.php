@@ -50,13 +50,24 @@
 
     <div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3"
          x-data="dashboardCharts({
-             monthly: @js($monthlyScans),
+             scanStats: @js($scanStats),
              riskLevels: @js($riskLevels),
              statusCounts: { safe: {{ $safeWebsites }}, needs_review: {{ $needsReviewWebsites }}, flagged: {{ $flaggedWebsites }} },
          })">
         <x-card class="lg:col-span-2">
-            <h2 class="mb-4 font-heading text-sm font-semibold text-slate-900 dark:text-white">Statistik Scan Bulanan</h2>
-            <div class="h-64"><canvas x-ref="monthlyChart"></canvas></div>
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+                <h2 class="font-heading text-sm font-semibold text-slate-900 dark:text-white" x-text="'Statistik Scan ' + periodLabels[period]">Statistik Scan Bulanan</h2>
+                <div class="inline-flex rounded-lg bg-slate-100 p-1 text-xs font-medium dark:bg-slate-800">
+                    <template x-for="(label, key) in periodLabels" :key="key">
+                        <button type="button"
+                                @click="setPeriod(key)"
+                                :class="period === key ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                                class="rounded-md px-3 py-1 transition"
+                                x-text="label"></button>
+                    </template>
+                </div>
+            </div>
+            <div class="h-64"><canvas x-ref="scanChart"></canvas></div>
         </x-card>
 
         <x-card>
@@ -109,7 +120,7 @@
                     @foreach ($recentActivity as $log)
                         <li class="px-4 py-3">
                             <p class="text-sm text-slate-700 dark:text-slate-200">{{ $log->description }}</p>
-                            <p class="mt-0.5 text-xs text-slate-400">{{ $log->user?->name ?? 'Sistem' }} &middot; {{ $log->created_at->diffForHumans() }}</p>
+                            <p class="mt-0.5 text-xs text-slate-400">{{ $log->user?->name ?? 'Sistem' }} &middot; {{ $log->created_at->translatedFormat('d M Y H:i') }}</p>
                         </li>
                     @endforeach
                 </ul>
@@ -154,7 +165,7 @@
                     @foreach ($threatNotifications as $notification)
                         <li class="px-4 py-3">
                             <p class="text-sm text-slate-700 dark:text-slate-200">{{ $notification->typeIcon() }} {{ $notification->title }}</p>
-                            <p class="mt-0.5 text-xs text-slate-400">{{ $notification->created_at->diffForHumans() }}</p>
+                            <p class="mt-0.5 text-xs text-slate-400">{{ $notification->created_at->translatedFormat('d M Y H:i') }}</p>
                         </li>
                     @endforeach
                 </ul>
@@ -165,9 +176,7 @@
             <div class="border-b border-slate-200 p-4 dark:border-slate-800">
                 <h2 class="font-heading text-sm font-semibold text-slate-900 dark:text-white">Progress Scan</h2>
             </div>
-            @if ($inProgressScans->isEmpty())
-                <x-empty-state title="Tidak ada scan berjalan" />
-            @else
+            @if ($inProgressScans->isNotEmpty())
                 <ul class="divide-y divide-slate-100 dark:divide-slate-800">
                     @foreach ($inProgressScans as $scan)
                         <li class="px-4 py-3" x-data="scanProgress('{{ route('scan-results.status', $scan) }}', { scan_state: '{{ $scan->scan_state }}', progress_percent: {{ $scan->progress_percent }} })">
@@ -175,6 +184,23 @@
                             <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700">
                                 <div class="h-full rounded-full bg-primary-600 transition-all" :style="`width: ${percent}%`"></div>
                             </div>
+                        </li>
+                    @endforeach
+                </ul>
+            @elseif ($recentCompletedScans->isEmpty())
+                <x-empty-state title="Tidak ada scan berjalan" />
+            @else
+                <ul class="divide-y divide-slate-100 dark:divide-slate-800">
+                    @foreach ($recentCompletedScans as $scan)
+                        <li class="flex items-center gap-3 px-4 py-3">
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate text-sm font-medium text-slate-700 dark:text-slate-200">{{ $scan->website?->website_name }}</p>
+                                <p class="truncate text-xs text-slate-400">{{ $scan->completed_at?->translatedFormat('d M Y H:i') }}</p>
+                                @if ($scan->scan_state === 'failed')
+                                    <p class="line-clamp-2 text-xs text-danger-600 dark:text-danger-500" title="{{ $scan->failure_reason ?? $scan->current_step }}">{{ $scan->failure_reason ?? $scan->current_step }}</p>
+                                @endif
+                            </div>
+                            <x-badge :color="$scan->riskLevelColor()">{{ $scan->riskLevelLabel() }}</x-badge>
                         </li>
                     @endforeach
                 </ul>

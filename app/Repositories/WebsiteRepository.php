@@ -30,8 +30,12 @@ class WebsiteRepository implements WebsiteRepositoryInterface
         return $website;
     }
 
+    /**
+     * Hapus permanen agar domain dapat didaftarkan kembali; hasil pemindaian ikut terhapus
+     * lewat cascade foreign key.
+     */
     public function delete(Website $website): bool
     {
-        return (bool) $website->delete();
+        return (bool) $website->forceDelete();
     }
 }

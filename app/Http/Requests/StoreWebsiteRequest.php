@@ -17,6 +17,13 @@ class StoreWebsiteRequest extends FormRequest
         return $this->user()->can('create', Website::class);
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('domain')) {
+            $this->merge(['domain' => Website::normalizeDomain($this->input('domain'))]);
+        }
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -27,6 +34,13 @@ class StoreWebsiteRequest extends FormRequest
         return [
             'opd_name' => ['required', 'string', 'max:255'],
             'domain' => ['required', 'string', 'max:255', Rule::unique('websites', 'domain')],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'domain.unique' => 'Domain ini sudah terdaftar.',
         ];
     }
 }

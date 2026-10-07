@@ -22,6 +22,5 @@ class Setting extends Model
         'smtp_username',
         'smtp_password',
         'smtp_encryption',
-        'scanner_keywords',
     ];
 }

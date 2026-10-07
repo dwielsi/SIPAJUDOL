@@ -8,7 +8,6 @@ use App\Services\Scanner\Detectors\HiddenLinkDetector;
 use App\Services\Scanner\Detectors\IframeDetector;
 use App\Services\Scanner\Detectors\JsInjectionDetector;
 use App\Services\Scanner\Detectors\JsObfuscationDetector;
-use App\Services\Scanner\Detectors\KeywordJudolDetector;
 use App\Services\Scanner\Detectors\MalwareSignatureDetector;
 use App\Services\Scanner\Detectors\MetaTagSpamDetector;
 use App\Services\Scanner\Detectors\RedirectDetector;
@@ -35,28 +34,9 @@ class DetectorsTest extends TestCase
         );
     }
 
-    public function test_keyword_judol_detector_finds_configured_keywords(): void
-    {
-        $detector = new KeywordJudolDetector(['slot gacor', 'togel']);
-        $page = $this->page('<p>Menang besar di slot gacor dan togel hari ini</p>');
-
-        $findings = $detector->detect($page, $this->website());
-
-        $this->assertCount(2, $findings);
-        $this->assertSame('keyword_judol', $findings[0]->category);
-    }
-
-    public function test_keyword_judol_detector_ignores_clean_page(): void
-    {
-        $detector = new KeywordJudolDetector(['slot gacor']);
-        $page = $this->page('<p>Selamat datang di website resmi pemerintah</p>');
-
-        $this->assertEmpty($detector->detect($page, $this->website()));
-    }
-
     public function test_iframe_detector_flags_external_iframe(): void
     {
-        $detector = new IframeDetector();
+        $detector = new IframeDetector;
         $page = $this->page('<iframe src="https://evil.example.com/ads"></iframe>');
 
         $findings = $detector->detect($page, $this->website());
@@ -67,7 +47,7 @@ class DetectorsTest extends TestCase
 
     public function test_iframe_detector_ignores_same_domain_iframe(): void
     {
-        $detector = new IframeDetector();
+        $detector = new IframeDetector;
         $page = $this->page('<iframe src="https://opd.kuburayakab.go.id/embed"></iframe>');
 
         $this->assertEmpty($detector->detect($page, $this->website()));
@@ -75,7 +55,7 @@ class DetectorsTest extends TestCase
 
     public function test_js_obfuscation_detector_flags_eval_with_base64(): void
     {
-        $detector = new JsObfuscationDetector();
+        $detector = new JsObfuscationDetector;
         $page = $this->page('<script>eval(atob("YWxlcnQoMSk="));</script>');
 
         $findings = $detector->detect($page, $this->website());
@@ -100,7 +80,7 @@ class DetectorsTest extends TestCase
 
     public function test_hidden_link_detector_flags_display_none_links(): void
     {
-        $detector = new HiddenLinkDetector();
+        $detector = new HiddenLinkDetector;
         $page = $this->page('<a href="https://judol.example.com" style="display:none">klik</a>');
 
         $findings = $detector->detect($page, $this->website());
@@ -111,7 +91,7 @@ class DetectorsTest extends TestCase
 
     public function test_redirect_detector_flags_cross_domain_redirect(): void
     {
-        $detector = new RedirectDetector();
+        $detector = new RedirectDetector;
         $page = $this->page(
             '<p>ok</p>',
             redirectChain: ['https://opd.kuburayakab.go.id', 'https://judol.example.com'],
@@ -125,7 +105,7 @@ class DetectorsTest extends TestCase
 
     public function test_redirect_detector_ignores_single_hop(): void
     {
-        $detector = new RedirectDetector();
+        $detector = new RedirectDetector;
         $page = $this->page('<p>ok</p>', redirectChain: ['https://opd.kuburayakab.go.id']);
 
         $this->assertEmpty($detector->detect($page, $this->website()));
@@ -148,7 +128,7 @@ class DetectorsTest extends TestCase
 
     public function test_meta_tag_spam_detector_flags_judol_keywords_in_meta(): void
     {
-        $detector = new MetaTagSpamDetector();
+        $detector = new MetaTagSpamDetector;
         $page = $this->page('<meta name="keywords" content="slot gacor, casino, maxwin">');
 
         $findings = $detector->detect($page, $this->website());
@@ -157,9 +137,17 @@ class DetectorsTest extends TestCase
         $this->assertSame('meta_tag_spam', $findings[0]->category);
     }
 
+    public function test_meta_tag_spam_detector_ignores_random_tokens(): void
+    {
+        $detector = new MetaTagSpamDetector;
+        $page = $this->page('<meta name="csrf-token" content="E8LuM7YLz87FD1GJUDIyHUK7m6I2QbtWch8OgVQ2"><meta name="description" content="Portal resmi BPKAD">');
+
+        $this->assertEmpty($detector->detect($page, $this->website()));
+    }
+
     public function test_script_injection_detector_flags_suspicious_tld(): void
     {
-        $detector = new ScriptInjectionDetector();
+        $detector = new ScriptInjectionDetector;
         $page = $this->page('<script src="https://cdn.malicious.xyz/inject.js"></script>');
 
         $findings = $detector->detect($page, $this->website());
@@ -170,7 +158,7 @@ class DetectorsTest extends TestCase
 
     public function test_js_injection_detector_flags_forced_external_redirect(): void
     {
-        $detector = new JsInjectionDetector();
+        $detector = new JsInjectionDetector;
         $page = $this->page('<script>window.location.href = "https://judol.example.com";</script>');
 
         $findings = $detector->detect($page, $this->website());

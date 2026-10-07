@@ -9,6 +9,7 @@ use App\Jobs\ScanWebsiteJob;
 use App\Models\ScanResult;
 use App\Models\Website;
 use App\Services\WebsiteService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,9 +30,17 @@ class WebsiteController extends Controller
             return $dataTable->ajax($request);
         }
 
+        $search = trim((string) $request->query('q', ''));
+
         $monitoredWebsites = auth()->user()->can('monitoring.view')
             ? Website::query()
-                ->with(['scanResults' => fn ($query) => $query->latest('scan_date')->limit(1)])
+                ->withScanningState()
+                ->with(['scanResults' => fn ($query) => $query->latest('scan_date')->orderByDesc('id')->limit(1)])
+                ->when($search !== '', fn (Builder $query) => $query->where(function (Builder $sub) use ($search) {
+                    $sub->where('website_name', 'like', "%{$search}%")
+                        ->orWhere('domain', 'like', "%{$search}%")
+                        ->orWhere('opd_name', 'like', "%{$search}%");
+                }))
                 ->orderBy('website_name')
                 ->get()
             : collect();
@@ -43,6 +52,7 @@ class WebsiteController extends Controller
         return view('websites.index', [
             'monitoredWebsites' => $monitoredWebsites,
             'scannableWebsites' => $scannableWebsites,
+            'monitoringSearch' => $search,
         ]);
     }
 
@@ -57,13 +67,7 @@ class WebsiteController extends Controller
     {
         $website = $this->websites->create($request->validated());
 
-        $scanResult = ScanResult::create([
-            'website_id' => $website->id,
-            'scan_date' => now(),
-            'scan_state' => 'queued',
-        ]);
-
-        ScanWebsiteJob::dispatch($website, $scanResult);
+        $scanResult = ScanWebsiteJob::start($website);
 
         return redirect()->route('scan-results.show', $scanResult)
             ->with('success', "Website {$website->domain} berhasil ditambahkan. Analisis otomatis sedang berjalan untuk memeriksa indikasi konten ilegal.");
@@ -89,7 +93,11 @@ class WebsiteController extends Controller
     {
         $this->websites->update($website, $request->validated());
 
-        return redirect()->route('websites.index')->with('success', 'Website berhasil diperbarui.');
+        $redirect = $request->query('from') === 'website'
+            ? redirect()->route('websites.show', array_filter([$website, 'from' => $request->query('origin') === 'monitoring' ? 'monitoring' : null]))
+            : redirect()->route('websites.index', ['tab' => 'daftar']);
+
+        return $redirect->with('success', 'Website berhasil diperbarui.');
     }
 
     public function destroy(Website $website): RedirectResponse

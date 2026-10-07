@@ -56,7 +56,7 @@
             <!-- Main column -->
             <div class="flex min-w-0 flex-1 flex-col gap-4 sm:gap-6">
                 <!-- Topbar -->
-                <header class="sticky top-3 z-30 flex h-16 shrink-0 items-center gap-3 rounded-2xl bg-white px-4 shadow-card sm:top-6 sm:gap-4 sm:px-5 dark:bg-gradient-to-b dark:from-slate-700 dark:to-slate-900">
+                <header class="sticky top-3 z-30 flex min-h-16 shrink-0 flex-wrap items-center gap-3 rounded-2xl bg-white px-4 py-2 shadow-card transform-gpu will-change-transform isolate sm:top-6 sm:gap-4 sm:px-5 dark:bg-gradient-to-b dark:from-slate-700 dark:to-slate-900">
                     <button @click="mobileOpen = true" class="text-slate-500 hover:text-slate-700 lg:hidden dark:text-slate-400 dark:hover:text-slate-200">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M4 6h16M4 12h16M4 18h16" />
@@ -71,10 +71,11 @@
                         @endisset
                     </div>
 
-                    <label class="hidden w-64 shrink-0 items-center gap-2 rounded-xl bg-slate-100 px-3.5 py-2 text-slate-400 focus-within:ring-2 focus-within:ring-teal-500/40 md:flex dark:bg-slate-900/60">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-                        <input type="text" placeholder="Cari..." class="w-full border-0 bg-transparent p-0 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-0 dark:text-slate-200">
-                    </label>
+                    @if (request()->routeIs(['websites.*', 'scan-results.*']))
+                        <div class="hidden shrink-0 md:flex" x-show="$store.websiteTab.current === 'monitoring'">
+                            {{ $headerAction ?? '' }}
+                        </div>
+                    @endif
 
                     <button @click="$store.theme.toggle()" class="shrink-0 rounded-xl p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200">
                         <svg x-show="!$store.theme.dark" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
@@ -97,7 +98,7 @@
                         </x-slot>
 
                         <x-slot name="content">
-                            <x-dropdown-link :href="route('profile.edit')">Profil Saya</x-dropdown-link>
+                            <x-dropdown-link :href="route('settings.edit')">Pengaturan</x-dropdown-link>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <x-dropdown-link href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();">
@@ -106,6 +107,12 @@
                             </form>
                         </x-slot>
                     </x-dropdown>
+
+                    @isset($headerAction)
+                        <div class="basis-full md:hidden" x-show="$store.websiteTab.current === 'monitoring'">
+                            {{ $headerAction }}
+                        </div>
+                    @endisset
                 </header>
 
                 <main class="flex-1">

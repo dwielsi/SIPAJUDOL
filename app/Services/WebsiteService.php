@@ -29,7 +29,7 @@ class WebsiteService
     private function normalize(array $data): array
     {
         if (! empty($data['domain'])) {
-            $data['domain'] = rtrim(preg_replace('#^https?://#i', '', trim($data['domain'])), '/');
+            $data['domain'] = Website::normalizeDomain($data['domain']);
         }
 
         if (empty($data['website_name'])) {

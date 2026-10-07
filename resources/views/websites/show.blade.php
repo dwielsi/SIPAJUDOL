@@ -1,17 +1,31 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between gap-4">
-            <h1 class="truncate font-heading text-base font-semibold text-slate-900 dark:text-white">{{ $website->website_name }}</h1>
-            <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex min-w-0 items-center gap-3">
+                @php
+                    $origin = request('from') === 'monitoring' ? 'monitoring' : null;
+                @endphp
+                @if ($origin === 'monitoring')
+                    <x-back-link :href="route('websites.index', ['tab' => 'monitoring'])" label="Kembali ke Monitoring" />
+                @else
+                    <x-back-link :href="route('websites.index', ['tab' => 'daftar'])" label="Kembali ke Daftar Website" />
+                @endif
+                <h1 class="min-w-0 truncate font-heading text-base font-semibold text-slate-900 dark:text-white">{{ $website->website_name }}</h1>
+            </div>
+            <div class="flex shrink-0 items-center gap-2">
                 @can('create', \App\Models\ScanResult::class)
                     <form method="POST" action="{{ route('scan-results.store') }}">
                         @csrf
                         <input type="hidden" name="website_id" value="{{ $website->id }}">
+                        <input type="hidden" name="from" value="website">
+                        @if ($origin)
+                            <input type="hidden" name="origin" value="{{ $origin }}">
+                        @endif
                         <x-button variant="primary" type="submit">Scan Sekarang</x-button>
                     </form>
                 @endcan
                 @can('update', $website)
-                    <x-button variant="secondary" onclick="window.location='{{ route('websites.edit', $website) }}'">Ubah</x-button>
+                    <x-button variant="secondary" onclick="window.location='{{ route('websites.edit', array_filter([$website, 'from' => 'website', 'origin' => $origin])) }}'">Ubah</x-button>
                 @endcan
             </div>
         </div>
@@ -23,9 +37,16 @@
             <span class="text-sm text-slate-400">Domain: {{ $website->domain }}</span>
         </div>
 
+        @if ($website->status === 'scan_failed')
+            <div class="mb-5 rounded-xl border border-danger-200 bg-danger-50 p-4 text-sm text-danger-700 dark:border-danger-500/30 dark:bg-danger-500/10 dark:text-danger-500">
+                <p class="font-semibold">Website ini gagal dipindai, sehingga status keamanannya belum dapat dipastikan.</p>
+                <p class="mt-1">{{ $website->scan_failure_reason ?? 'Penyebab kegagalan tidak diketahui.' }}</p>
+            </div>
+        @endif
+
         <dl class="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ([
-                'Terakhir Scan' => $website->last_scanned_at?->diffForHumans() ?? 'Belum pernah',
+                'Terakhir Scan' => $website->last_scanned_at?->translatedFormat('d M Y H:i') ?? 'Belum pernah',
                 'Response Time' => $website->response_time_ms ? "{$website->response_time_ms} ms" : '—',
                 'SSL' => $website->ssl_valid === null ? 'Belum diperiksa' : ($website->ssl_valid ? 'Valid' : 'Tidak valid'),
                 'Skor Risiko' => "{$website->latest_risk_score}/100",
@@ -42,15 +63,11 @@
                 'Nama OPD' => $website->opd_name,
                 'Nama Website' => $website->website_name,
                 'Domain' => $website->domain,
-                'Subdomain' => $website->subdomain,
                 'IP Server' => $website->ip_server,
                 'Hosting' => $website->hosting,
                 'CMS' => $website->cms,
                 'Versi CMS' => $website->cms_version,
                 'Lokasi Server' => $website->server_location,
-                'Admin Website' => $website->admin_name,
-                'Email Admin' => $website->admin_email,
-                'Nomor HP Admin' => $website->admin_phone,
             ] as $label => $value)
                 <div>
                     <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">{{ $label }}</dt>
@@ -69,9 +86,18 @@
 
     @if ($website->scanResults->isNotEmpty())
         <x-card class="mt-5 max-w-4xl">
+            @php
+                // Satu titik per hari (scan selesai terakhir hari itu); scan gagal tidak punya skor sehingga dilewati.
+                $trend = $website->scanResults
+                    ->where('scan_state', 'completed')
+                    ->sortBy(fn ($scan) => [$scan->scan_date->toDateString(), $scan->id])
+                    ->groupBy(fn ($scan) => $scan->scan_date->toDateString())
+                    ->map->last()
+                    ->values();
+            @endphp
             <div x-data="riskTrendChart({
-                    labels: @js($website->scanResults->sortBy('scan_date')->pluck('scan_date')->map(fn ($d) => $d->translatedFormat('d M'))->values()),
-                    scores: @js($website->scanResults->sortBy('scan_date')->pluck('risk_score')->values()),
+                    labels: @js($trend->map(fn ($scan) => $scan->scan_date->translatedFormat('d M'))),
+                    scores: @js($trend->pluck('risk_score')),
                 })">
                 <h2 class="mb-3 font-heading text-sm font-semibold text-slate-900 dark:text-white">Grafik Ancaman (Skor Risiko)</h2>
                 <div class="h-56"><canvas x-ref="riskTrendChart"></canvas></div>
@@ -103,20 +129,18 @@
                             <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                                 <td class="px-4 py-3.5 text-slate-700 dark:text-slate-200">{{ $scanResult->scan_date->translatedFormat('d M Y') }}</td>
                                 <td class="px-4 py-3.5">
-                                    <x-badge :color="match($scanResult->status) { 'flagged' => 'danger', 'needs_review' => 'warning', default => 'success' }">
-                                        {{ match($scanResult->status) { 'flagged' => 'Terindikasi', 'needs_review' => 'Perlu Pemeriksaan', default => 'Aman' } }}
-                                    </x-badge>
+                                    <x-badge :color="$scanResult->riskLevelColor()">{{ $scanResult->riskLevelLabel() }}</x-badge>
                                 </td>
                                 <td class="px-4 py-3.5 text-slate-500 dark:text-slate-400">{{ $scanResult->risk_score }}</td>
                                 <td class="px-4 py-3.5 text-slate-500 dark:text-slate-400">{{ $scanResult->judol_link_count }}</td>
                                 <td class="px-4 py-3.5 text-right">
                                     @can('view', $scanResult)
-                                        <a href="{{ route('scan-results.show', $scanResult) }}" class="mr-3 text-sm font-medium text-primary-600 hover:underline dark:text-primary-400">Detail</a>
+                                        <a href="{{ route('scan-results.show', array_filter([$scanResult, 'from' => 'website', 'origin' => $origin])) }}" class="mr-3 text-sm font-medium text-primary-600 hover:underline dark:text-primary-400">Detail</a>
                                     @endcan
                                     @if ($scanResult->reports->isNotEmpty())
-                                        <a href="{{ route('reports.show', $scanResult->reports->first()) }}" class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-400">Lihat Laporan</a>
-                                    @elseif (Gate::allows('create', \App\Models\Report::class))
-                                        <a href="{{ route('reports.create', ['scan_result_id' => $scanResult->id]) }}" class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-400">Buat Laporan</a>
+                                        <a href="{{ route('reports.show', array_filter([$scanResult->reports->first(), 'from' => 'website', 'origin' => $origin])) }}" class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-400">Lihat Laporan</a>
+                                    @elseif ($scanResult->scan_state === 'completed' && Gate::allows('create', \App\Models\Report::class))
+                                        <a href="{{ route('reports.create', array_filter(['scan_result_id' => $scanResult->id, 'source' => 'website', 'website' => $website->id, 'origin' => $origin])) }}" class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-400">Buat Laporan</a>
                                     @else
                                         <span class="text-sm text-slate-400">—</span>
                                     @endif

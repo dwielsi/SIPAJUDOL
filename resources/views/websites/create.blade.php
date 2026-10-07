@@ -1,6 +1,9 @@
 <x-app-layout>
     <x-slot name="header">
-        <h1 class="truncate font-heading text-base font-semibold text-slate-900 dark:text-white">Tambah Website</h1>
+        <div class="flex min-w-0 items-center gap-3">
+            <x-back-link :href="route('websites.index', ['tab' => 'daftar'])" label="Kembali ke Daftar Website" />
+            <h1 class="min-w-0 truncate font-heading text-base font-semibold text-slate-900 dark:text-white">Tambah Website</h1>
+        </div>
     </x-slot>
 
     <x-card class="max-w-2xl">
@@ -27,7 +30,7 @@
             </div>
 
             <div class="mt-6 flex items-center justify-end gap-3 border-t border-slate-200 pt-5 dark:border-slate-800">
-                <x-button variant="secondary" onclick="window.location='{{ route('websites.index') }}'">Batal</x-button>
+                <x-button variant="secondary" onclick="window.location='{{ route('websites.index', ['tab' => 'daftar']) }}'">Batal</x-button>
                 <x-button type="submit" variant="primary">Simpan &amp; Analisis</x-button>
             </div>
         </form>

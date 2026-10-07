@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\KeywordController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
@@ -39,17 +38,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
 
-    Route::resource('keywords', KeywordController::class)->only(['index', 'store', 'update', 'destroy']);
 
     Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
 
     Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
     Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
-    Route::post('/settings/test-email', [SettingController::class, 'testEmail'])->name('settings.test-email');
 
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    // Halaman "Profil Saya" sekarang digabung ke halaman Pengaturan.
+    Route::redirect('/profile', '/settings');
+
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 require __DIR__.'/auth.php';

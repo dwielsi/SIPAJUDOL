@@ -1,15 +1,25 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between gap-4">
-            <div>
-                <h1 class="truncate font-heading text-base font-semibold text-slate-900 dark:text-white">Detail Hasil Scan</h1>
-                <p class="text-xs text-slate-400">{{ $scanResult->website?->website_name }} &middot; {{ $scanResult->scan_date->translatedFormat('d M Y') }}</p>
+        <div class="flex min-w-0 items-center gap-3">
+            @php
+                [$backUrl, $backLabel] = match (request('from')) {
+                    'monitoring' => [route('websites.index', ['tab' => 'monitoring']), 'Kembali ke Monitoring'],
+                    'website' => [route('websites.show', array_filter([$scanResult->website_id, 'from' => request('origin') === 'monitoring' ? 'monitoring' : null])), 'Kembali ke Detail Website'],
+                    default => [route('websites.index', ['tab' => 'riwayat']), 'Kembali ke Riwayat Scan'],
+                };
+            @endphp
+            <x-back-link :href="$backUrl" :label="$backLabel" />
+            <div class="min-w-0 flex-1">
+                <div class="flex items-center justify-between gap-3">
+                    <h1 class="min-w-0 truncate font-heading text-base font-semibold text-slate-900 dark:text-white">Detail Hasil Scan</h1>
+                    @can('create', \App\Models\Report::class)
+                        @if ($scanResult->scan_state === 'completed')
+                            <x-button variant="primary" onclick="window.location='{{ route('reports.create', array_filter(['scan_result_id' => $scanResult->id, 'from' => request('from'), 'origin' => request('origin')])) }}'">Buat Laporan</x-button>
+                        @endif
+                    @endcan
+                </div>
+                <p class="truncate text-xs text-slate-400">{{ $scanResult->website?->website_name }} &middot; {{ $scanResult->scan_date->translatedFormat('d M Y') }}</p>
             </div>
-            @can('create', \App\Models\Report::class)
-                @if ($scanResult->scan_state === 'completed')
-                    <x-button variant="primary" onclick="window.location='{{ route('reports.create', ['scan_result_id' => $scanResult->id]) }}'">Buat Laporan</x-button>
-                @endif
-            @endcan
         </div>
     </x-slot>
 
@@ -35,6 +45,13 @@
             </x-card>
         </template>
 
+        @if ($scanResult->scan_state === 'failed')
+            <div class="rounded-xl border border-danger-200 bg-danger-50 p-4 text-sm text-danger-700 dark:border-danger-500/30 dark:bg-danger-500/10 dark:text-danger-500">
+                <p class="font-semibold">Pemindaian gagal &mdash; status keamanan website belum dapat dipastikan (bukan berarti aman).</p>
+                <p class="mt-1">{{ $scanResult->failure_reason ?? $scanResult->current_step ?? 'Penyebab kegagalan tidak diketahui.' }}</p>
+            </div>
+        @endif
+
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <x-card>
                 <p class="text-xs font-medium uppercase tracking-wide text-slate-400">Risk Score</p>
@@ -57,9 +74,8 @@
             </x-card>
         </div>
 
-        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+        <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
             @foreach ([
-                'Keyword' => $scanResult->keyword_count,
                 'Link Konten Ilegal' => $scanResult->judol_link_count,
                 'Redirect' => $scanResult->redirect_count,
                 'Malware' => $scanResult->malware_count,
@@ -83,7 +99,7 @@
                             class="w-full rounded-xl border border-slate-200 object-cover object-top dark:border-slate-700"
                         >
                     </a>
-                @elseif ($scanResult->scan_state === 'completed')
+                @elseif (in_array($scanResult->scan_state, ['completed', 'failed'], true))
                     <div class="flex h-64 items-center justify-center rounded-xl border border-dashed border-slate-300 text-center text-sm text-slate-400 dark:border-slate-700">
                         Tangkapan layar tidak tersedia untuk pemindaian ini.
                     </div>
@@ -103,18 +119,19 @@
                             <p class="text-slate-700 dark:text-slate-200">Scan dimulai</p>
                         </li>
                     @endif
-                    @if ($scanResult->keyword_count > 0)
-                        <li>
-                            <p class="text-xs text-slate-400">&mdash;</p>
-                            <p class="text-slate-700 dark:text-slate-200">Kata kunci konten ilegal ditemukan</p>
-                        </li>
-                    @endif
-                    @if ($scanResult->redirect_count > 0)
-                        <li>
-                            <p class="text-xs text-slate-400">&mdash;</p>
-                            <p class="text-slate-700 dark:text-slate-200">Redirect mencurigakan ditemukan</p>
-                        </li>
-                    @endif
+                    @foreach ([
+                        'judol_link_count' => 'Tautan/kata kunci konten ilegal ditemukan',
+                        'redirect_count' => 'Redirect mencurigakan ditemukan',
+                        'malware_count' => 'Malware, skrip, atau iframe berbahaya ditemukan',
+                        'external_link_count' => 'Tautan eksternal tidak wajar ditemukan',
+                    ] as $column => $label)
+                        @if ($scanResult->{$column} > 0)
+                            <li>
+                                <p class="text-xs text-slate-400">&mdash;</p>
+                                <p class="text-slate-700 dark:text-slate-200">{{ $label }} ({{ $scanResult->{$column} }})</p>
+                            </li>
+                        @endif
+                    @endforeach
                     @if ($scanResult->completed_at)
                         <li>
                             <p class="text-xs text-slate-400">{{ $scanResult->completed_at->format('H:i') }}</p>
@@ -135,7 +152,15 @@
                     </div>
                     <div>
                         <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Kesimpulan</dt>
-                        <dd class="mt-1 text-slate-700 dark:text-slate-200">{{ $scanResult->ai_conclusion }}</dd>
+                        <dd class="mt-1 text-slate-700 dark:text-slate-200">{!! preg_replace(
+                            ['/\bTERINDIKASI\b/', '/\bPERLU PEMERIKSAAN\b/', '/\bAMAN\b/'],
+                            [
+                                '<span class="font-semibold text-danger-600">TERINDIKASI</span>',
+                                '<span class="font-semibold text-warning-600">PERLU PEMERIKSAAN</span>',
+                                '<span class="font-semibold text-success-600">AMAN</span>',
+                            ],
+                            e($scanResult->ai_conclusion),
+                        ) !!}</dd>
                     </div>
                     <div>
                         <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Rekomendasi</dt>
@@ -146,34 +171,50 @@
         @endif
 
         <x-card :padding="false">
-            <div class="border-b border-slate-200 p-4 dark:border-slate-800">
-                <h2 class="font-heading text-sm font-semibold text-slate-900 dark:text-white">Detail Temuan</h2>
+            <div class="px-5 pt-5 pb-3">
+                <h2 class="font-heading text-base font-semibold text-slate-900 dark:text-white">Detail Temuan</h2>
             </div>
             @if ($scanResult->findings->isEmpty())
                 <x-empty-state title="Tidak ada temuan" description="Pemindaian tidak menemukan indikasi ancaman." />
             @else
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                <div class="overflow-x-auto px-5 pb-3">
+                    <table class="w-full min-w-[40rem] table-fixed text-left text-sm">
+                        <colgroup>
+                            <col class="w-[17%]">
+                            <col class="w-[13%]">
+                            <col>
+                            <col class="w-[17%]">
+                        </colgroup>
+                        <thead class="border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:border-slate-800">
                             <tr>
-                                <th class="px-4 py-3">Jenis Ancaman</th>
-                                <th class="px-4 py-3">Tingkat</th>
-                                <th class="px-4 py-3">Pesan</th>
-                                <th class="px-4 py-3">Lokasi Script</th>
+                                <th class="py-3 pr-4">Jenis Ancaman</th>
+                                <th class="py-3 pr-4">Tingkat</th>
+                                <th class="py-3 pr-4">Pesan</th>
+                                <th class="py-3">Lokasi Script</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                             @foreach ($scanResult->findings as $finding)
-                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                                    <td class="px-4 py-3.5 font-medium text-slate-700 dark:text-slate-200">{{ str($finding->category)->headline() }}</td>
-                                    <td class="px-4 py-3.5"><x-badge :color="$finding->severityColor()">{{ ucfirst($finding->severity) }}</x-badge></td>
-                                    <td class="px-4 py-3.5 text-slate-500 dark:text-slate-400">
-                                        {{ $finding->message }}
+                                @php
+                                    $location = $finding->location ?? $finding->page_url;
+                                    $isFilePath = $location && ! str_starts_with($location, 'http') && preg_match('/\.\w{2,5}$/', $location);
+                                @endphp
+                                <tr class="align-top">
+                                    <td class="py-4 pr-4 font-semibold text-slate-800 dark:text-slate-100">{{ str($finding->category)->headline() }}</td>
+                                    <td class="py-4 pr-4"><x-badge :color="$finding->severityColor()">{{ ucfirst($finding->severity) }}</x-badge></td>
+                                    <td class="py-4 pr-4">
+                                        <p class="line-clamp-2 text-slate-600 dark:text-slate-300" title="{{ $finding->message }}">{{ $finding->message }}</p>
                                         @if ($finding->evidence)
-                                            <p class="mt-0.5 truncate text-xs text-slate-400">{{ $finding->evidence }}</p>
+                                            <p class="mt-1 truncate text-xs text-slate-400" title="{{ $finding->evidence }}">{{ $finding->evidence }}</p>
                                         @endif
                                     </td>
-                                    <td class="px-4 py-3.5 text-xs text-slate-400">{{ $finding->location ?? $finding->page_url ?? '—' }}</td>
+                                    <td class="py-4">
+                                        <p @class([
+                                            'truncate text-xs',
+                                            'font-mono text-slate-600 dark:text-slate-300' => $isFilePath,
+                                            'text-slate-500 dark:text-slate-400' => ! $isFilePath,
+                                        ]) title="{{ $location }}">{{ $location ?? '—' }}</p>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

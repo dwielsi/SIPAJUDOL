@@ -1,26 +1,35 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between gap-4">
-            <div>
-                <h1 class="truncate font-heading text-base font-semibold text-slate-900 dark:text-white">{{ $report->report_number }}</h1>
-                <p class="text-xs text-slate-400">Laporan tanggal {{ $report->report_date->translatedFormat('d M Y') }}</p>
-            </div>
-            <div class="flex items-center gap-2">
-                @can('print', $report)
-                    <x-button variant="secondary" onclick="window.open('{{ route('reports.pdf', $report) }}', '_blank')">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6v-8Z"/></svg>
-                        Cetak Laporan
-                    </x-button>
-                @endcan
-                @can('send', $report)
-                    <x-button variant="secondary" x-data @click="$dispatch('open-modal', 'send-report')">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-                        Kirim ke Instansi
-                    </x-button>
-                @endcan
-                @can('update', $report)
-                    <x-button variant="secondary" onclick="window.location='{{ route('reports.edit', $report) }}'">Ubah</x-button>
-                @endcan
+        @php
+            $backQuery = array_filter(['from' => request('from') === 'website' ? 'website' : null, 'origin' => request('origin') === 'monitoring' ? 'monitoring' : null]);
+            [$backUrl, $backLabel] = isset($backQuery['from']) && $report->scanResult
+                ? [route('websites.show', array_filter([$report->scanResult->website_id, 'from' => $backQuery['origin'] ?? null])), 'Kembali ke Detail Website']
+                : [route('reports.index'), 'Kembali ke Laporan'];
+        @endphp
+        <div class="flex min-w-0 items-center gap-3">
+            <x-back-link :href="$backUrl" :label="$backLabel" />
+            <div class="min-w-0 flex-1">
+                <div class="flex items-center justify-between gap-3">
+                    <h1 class="min-w-0 truncate font-heading text-base font-semibold text-slate-900 dark:text-white">{{ $report->report_number }}</h1>
+                    <div class="flex shrink-0 items-center gap-2">
+                        @can('print', $report)
+                            <x-button variant="secondary" onclick="window.open('{{ route('reports.pdf', $report) }}', '_blank')">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6v-8Z"/></svg>
+                                Cetak Laporan
+                            </x-button>
+                        @endcan
+                        @can('send', $report)
+                            <x-button variant="secondary" x-data @click="$dispatch('open-modal', 'send-report')">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                                Kirim ke Instansi
+                            </x-button>
+                        @endcan
+                        @can('update', $report)
+                            <x-button variant="secondary" onclick="window.location='{{ route('reports.edit', [$report, ...$backQuery]) }}'">Ubah</x-button>
+                        @endcan
+                    </div>
+                </div>
+                <p class="truncate text-xs text-slate-400">Laporan tanggal {{ $report->report_date->translatedFormat('d M Y') }}</p>
             </div>
         </div>
     </x-slot>
@@ -104,7 +113,7 @@
 
     @can('send', $report)
         <x-modal name="send-report" maxWidth="md" :show="$errors->has('email') || $errors->has('note')">
-            <form method="POST" action="{{ route('reports.send', $report) }}" class="p-6">
+            <form method="POST" action="{{ route('reports.send', [$report, ...$backQuery]) }}" class="p-6">
                 @csrf
                 <h3 class="font-heading text-base font-semibold text-slate-900 dark:text-white">Kirim Laporan ke Instansi</h3>
                 <p class="mt-1 text-xs text-slate-400">Laporan PDF akan dilampirkan dan dikirim melalui email ke pengelola website terkait.</p>

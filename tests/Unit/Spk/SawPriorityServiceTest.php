@@ -12,8 +12,8 @@ class SawPriorityServiceTest extends TestCase
     private function criteria(): array
     {
         return [
-            'malware_count' => ['label' => 'Malware', 'weight' => 0.5, 'type' => 'benefit'],
-            'judol_link_count' => ['label' => 'Link Judol', 'weight' => 0.5, 'type' => 'benefit'],
+            'malware_count' => ['label' => 'Malware', 'weight' => 0.5, 'type' => 'benefit', 'max' => 10],
+            'judol_link_count' => ['label' => 'Link Konten Ilegal', 'weight' => 0.5, 'type' => 'benefit', 'max' => 10],
         ];
     }
 

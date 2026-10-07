@@ -6,9 +6,7 @@ use App\Models\Website;
 use App\Services\Scanner\Contracts\SiteProbeInterface;
 use App\Services\Scanner\DTO\Finding;
 use App\Services\Scanner\DTO\PageContent;
-use Illuminate\Http\Client\Response;
-use Illuminate\Support\Facades\Http;
-use Throwable;
+use App\Services\Scanner\Support\ProbeGuard;
 
 class BackdoorDetector implements SiteProbeInterface
 {
@@ -31,16 +29,12 @@ class BackdoorDetector implements SiteProbeInterface
         $scheme = parse_url($homepage->url, PHP_URL_SCHEME) ?: 'https';
         $host = parse_url($homepage->url, PHP_URL_HOST) ?: $website->domain;
 
+        $guard = ProbeGuard::for("{$scheme}://{$host}", $this->timeout);
+
         foreach ($this->probePaths as $path) {
             $url = "{$scheme}://{$host}/".ltrim($path, '/');
 
-            try {
-                $response = Http::timeout($this->timeout)->get($url);
-            } catch (Throwable) {
-                continue;
-            }
-
-            if ($this->looksSuspicious($response, $homepage->html)) {
+            if ($guard->exists($guard->fetch($url), $homepage->html)) {
                 $findings[] = new Finding(
                     category: 'backdoor',
                     severity: 'critical',
@@ -53,26 +47,5 @@ class BackdoorDetector implements SiteProbeInterface
         }
 
         return $findings;
-    }
-
-    private function looksSuspicious(Response $response, string $homepageHtml): bool
-    {
-        if (! $response->successful()) {
-            return false;
-        }
-
-        $body = $response->body();
-
-        if (trim($body) === trim($homepageHtml)) {
-            return false;
-        }
-
-        $lower = strtolower($body);
-
-        if (strlen($lower) < 20 || str_contains($lower, 'page not found') || str_contains($lower, '404 not found')) {
-            return false;
-        }
-
-        return true;
     }
 }

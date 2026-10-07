@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
         $kabid = User::factory()->create([
             'name' => 'Kepala Bidang',
             'username' => 'kabid',
-            'email' => ' ',
+            'email' => null,
             'password' => 'password',
         ]);
         $kabid->assignRole(RoleEnum::Kabid->value);

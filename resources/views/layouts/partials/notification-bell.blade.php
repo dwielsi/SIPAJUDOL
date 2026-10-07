@@ -20,9 +20,9 @@
                     <template x-for="item in items" :key="item.id">
                         <div class="flex items-start gap-2 px-4 py-3 text-sm hover:bg-slate-50 dark:hover:bg-slate-700/50">
                             <span x-text="item.icon" class="leading-none"></span>
-                            <div class="min-w-0">
-                                <p class="font-medium text-slate-700 dark:text-slate-200" x-text="item.title"></p>
-                                <p class="truncate text-xs text-slate-400" x-text="item.message"></p>
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate font-medium text-slate-700 dark:text-slate-200" x-text="item.title"></p>
+                                <p class="line-clamp-2 break-words text-xs text-slate-400" x-text="item.message" :title="item.message"></p>
                                 <p class="mt-0.5 text-xs text-slate-400" x-text="item.created_at"></p>
                             </div>
                         </div>

@@ -12,7 +12,7 @@
                 <div class="relative w-full sm:max-w-xs">
                     <svg xmlns="http://www.w3.org/2000/svg" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                     <input type="text" x-model="search" placeholder="Cari aktivitas..."
-                           class="w-full rounded-lg border-slate-300 pl-9 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500">
+                           class="w-full rounded-xl border-0 bg-slate-100 pl-9 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/40 dark:bg-slate-900/60 dark:text-slate-200 dark:placeholder-slate-500">
                 </div>
             </div>
 
@@ -50,7 +50,7 @@
                         <template x-for="row in rows" :key="row.id">
                             <tr class="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
                                 <td class="px-4 py-3.5 font-medium text-slate-700 dark:text-slate-200" x-text="row.user_name"></td>
-                                <td class="px-4 py-3.5 text-slate-500 dark:text-slate-400" x-text="row.action"></td>
+                                <td class="px-4 py-3.5 text-slate-500 dark:text-slate-400" x-text="row.action_label"></td>
                                 <td class="px-4 py-3.5 text-slate-500 dark:text-slate-400" x-text="row.description"></td>
                                 <td class="px-4 py-3.5 text-slate-500 dark:text-slate-400" x-text="row.created_at_label"></td>
                             </tr>

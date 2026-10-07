@@ -6,8 +6,7 @@ use App\Models\Website;
 use App\Services\Scanner\Contracts\SiteProbeInterface;
 use App\Services\Scanner\DTO\Finding;
 use App\Services\Scanner\DTO\PageContent;
-use Illuminate\Support\Facades\Http;
-use Throwable;
+use App\Services\Scanner\Support\ProbeGuard;
 
 class ForeignFileDetector implements SiteProbeInterface
 {
@@ -32,18 +31,14 @@ class ForeignFileDetector implements SiteProbeInterface
         $scheme = parse_url($homepage->url, PHP_URL_SCHEME) ?: 'https';
         $host = parse_url($homepage->url, PHP_URL_HOST) ?: $website->domain;
 
+        $guard = ProbeGuard::for("{$scheme}://{$host}", $this->timeout);
+
         foreach ($this->directories as $directory) {
             foreach ($this->extensions as $extension) {
                 $path = trim($directory, '/')."/index.{$extension}";
                 $url = "{$scheme}://{$host}/{$path}";
 
-                try {
-                    $response = Http::timeout($this->timeout)->get($url);
-                } catch (Throwable) {
-                    continue;
-                }
-
-                if ($response->successful() && strlen($response->body()) > 20 && trim($response->body()) !== trim($homepage->html)) {
+                if ($guard->exists($guard->fetch($url), $homepage->html)) {
                     $findings[] = new Finding(
                         category: 'foreign_file',
                         severity: 'high',

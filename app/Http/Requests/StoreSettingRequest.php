@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class StoreSettingRequest extends FormRequest
 {
@@ -19,6 +18,9 @@ class StoreSettingRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
+     * Konfigurasi SMTP tidak lagi diatur lewat halaman ini — sistem
+     * memakai konfigurasi mail bawaan (.env).
+     *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
@@ -28,11 +30,6 @@ class StoreSettingRequest extends FormRequest
             'address' => ['nullable', 'string', 'max:500'],
             'head_name' => ['nullable', 'string', 'max:255'],
             'nip' => ['nullable', 'string', 'max:50'],
-            'smtp_host' => ['nullable', 'string', 'max:255'],
-            'smtp_port' => ['nullable', 'integer', 'min:1', 'max:65535'],
-            'smtp_username' => ['nullable', 'string', 'max:255'],
-            'smtp_password' => ['nullable', 'string', 'max:255'],
-            'smtp_encryption' => ['nullable', Rule::in(['tls', 'ssl', 'none'])],
         ];
     }
 }

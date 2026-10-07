@@ -19,7 +19,7 @@ return [
         ],
         'judol_link_count' => [
             'label' => 'Jumlah Link Konten Ilegal',
-            'weight' => 0.25,
+            'weight' => 0.35,
             'type' => 'benefit',
             'max' => 50,
         ],
@@ -28,12 +28,6 @@ return [
             'weight' => 0.20,
             'type' => 'benefit',
             'max' => 30,
-        ],
-        'keyword_count' => [
-            'label' => 'Jumlah Keyword Judol',
-            'weight' => 0.10,
-            'type' => 'benefit',
-            'max' => 50,
         ],
         'redirect_count' => [
             'label' => 'Jumlah Redirect Mencurigakan',

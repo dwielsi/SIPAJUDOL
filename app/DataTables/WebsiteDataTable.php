@@ -13,7 +13,8 @@ class WebsiteDataTable
     public function query(Request $request): Builder
     {
         return Website::query()
-            ->with(['scanResults' => fn ($query) => $query->latest('scan_date')->limit(1)])
+            ->withScanningState()
+            ->with(['scanResults' => fn ($query) => $query->latest('scan_date')->orderByDesc('id')->limit(1)])
             ->when(
                 $request->query('status'),
                 fn (Builder $query, string $status) => $query->where('status', $status),
@@ -31,6 +32,7 @@ class WebsiteDataTable
                 'label' => $website->statusLabel(),
             ])
             ->addColumn('actions', fn (Website $website) => [
+                'is_scanning' => $website->isScanning(),
                 'can_update' => $user->can('update', $website),
                 'can_delete' => $user->can('delete', $website),
                 'show_url' => route('websites.show', $website),

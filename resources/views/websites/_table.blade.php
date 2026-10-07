@@ -1,5 +1,5 @@
     <div x-data="{
-            ...serverTable('{{ route('websites.index') }}', ['opd_name', 'website_name', 'domain', 'badge', 'actions'], @js(array_filter(['status' => request('status')]))),
+            ...serverTable('{{ route('websites.index') }}', ['opd_name', 'website_name', 'domain', 'badge', 'actions'], @js(array_filter(['status' => request('status')])), @js(request('q', ''))),
             async destroy(row) {
                 const result = await Swal.fire({
                     title: 'Hapus website ini?',
@@ -35,7 +35,7 @@
 
         @if (request()->filled('status'))
             @php
-                $statusLabels = ['safe' => 'Website Aman', 'needs_review' => 'Perlu Pemeriksaan', 'flagged' => 'Website Terindikasi'];
+                $statusLabels = ['safe' => 'Website Aman', 'needs_review' => 'Perlu Pemeriksaan', 'flagged' => 'Website Terindikasi', 'scan_failed' => 'Gagal Dipindai'];
             @endphp
             <div class="flex items-center gap-2 rounded-lg bg-primary-50 px-4 py-2.5 text-sm text-primary-700 dark:bg-primary-500/10 dark:text-primary-400">
                 <span>Menampilkan filter: <strong>{{ $statusLabels[request('status')] ?? request('status') }}</strong></span>
@@ -51,7 +51,7 @@
                 <div class="relative w-full sm:max-w-xs">
                     <svg xmlns="http://www.w3.org/2000/svg" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                     <input type="text" x-model="search" placeholder="Cari nama OPD, website, atau domain..."
-                           class="w-full rounded-lg border-slate-300 pl-9 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500">
+                           class="w-full rounded-xl border-0 bg-slate-100 pl-9 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/40 dark:bg-slate-900/60 dark:text-slate-200 dark:placeholder-slate-500">
                 </div>
 
                 @can('create', \App\Models\Website::class)
@@ -106,11 +106,14 @@
                                               'bg-success-50 text-success-700 dark:bg-success-500/10 dark:text-success-500': row.badge.color === 'success',
                                               'bg-warning-50 text-warning-700 dark:bg-warning-500/10 dark:text-warning-500': row.badge.color === 'warning',
                                               'bg-danger-50 text-danger-700 dark:bg-danger-500/10 dark:text-danger-500': row.badge.color === 'danger',
+                                              'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-400': row.badge.color === 'primary',
+                                              'bg-slate-100 text-slate-600 dark:bg-slate-700/50 dark:text-slate-300': row.badge.color === 'slate',
                                           }"
                                           x-text="row.badge.label"></span>
                                 </td>
                                 <td class="px-4 py-3.5">
-                                    <div class="flex items-center justify-end gap-1">
+                                    <div x-show="row.actions.is_scanning" class="text-right text-slate-300 dark:text-slate-600">&mdash;</div>
+                                    <div x-show="!row.actions.is_scanning" class="flex items-center justify-end gap-1">
                                         <a :href="row.actions.show_url" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-primary-600 dark:hover:bg-slate-700" title="Lihat">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
                                         </a>

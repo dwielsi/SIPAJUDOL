@@ -26,10 +26,10 @@ class ReportEmailTest extends TestCase
         $response = $this->actingAs($user)->get(route('settings.edit'));
 
         $response->assertOk();
-        $response->assertSee('Konfigurasi SMTP');
+        $response->assertSee('Profil Instansi');
     }
 
-    public function test_settings_update_persists_smtp_config(): void
+    public function test_settings_update_persists_instansi_profile(): void
     {
         $this->seed(RolePermissionSeeder::class);
         $user = User::factory()->create();
@@ -37,17 +37,13 @@ class ReportEmailTest extends TestCase
 
         $response = $this->actingAs($user)->put(route('settings.update'), [
             'instansi_name' => 'Diskominfo Test',
-            'smtp_host' => 'smtp.mailtrap.io',
-            'smtp_port' => 587,
-            'smtp_username' => 'user@test.id',
-            'smtp_password' => 'secret',
-            'smtp_encryption' => 'tls',
+            'head_name' => 'Kepala Diskominfo',
         ]);
 
         $response->assertRedirect(route('settings.edit'));
         $this->assertDatabaseHas('settings', [
             'instansi_name' => 'Diskominfo Test',
-            'smtp_host' => 'smtp.mailtrap.io',
+            'head_name' => 'Kepala Diskominfo',
         ]);
     }
 

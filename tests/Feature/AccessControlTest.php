@@ -29,11 +29,6 @@ class AccessControlTest extends TestCase
         return $user;
     }
 
-    public function test_kabid_can_view_keyword_management(): void
-    {
-        $this->actingAs($this->kabid())->get('/keywords')->assertOk();
-    }
-
     public function test_kabid_can_view_activity_logs(): void
     {
         $this->actingAs($this->kabid())->get('/activity-logs')->assertOk();
@@ -41,7 +36,10 @@ class AccessControlTest extends TestCase
 
     public function test_kabid_can_view_monitoring(): void
     {
-        $this->actingAs($this->kabid())->get('/monitoring')->assertOk();
+        $kabid = $this->kabid();
+
+        $this->actingAs($kabid)->get('/monitoring')->assertRedirect('/websites');
+        $this->actingAs($kabid)->get('/websites?tab=monitoring')->assertOk();
     }
 
     public function test_kabid_can_view_notifications(): void

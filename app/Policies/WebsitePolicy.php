@@ -36,7 +36,7 @@ class WebsitePolicy
      */
     public function update(User $user, Website $website): bool
     {
-        return $user->can('websites.update');
+        return $user->can('websites.update') && ! $website->isScanning();
     }
 
     /**
@@ -44,7 +44,7 @@ class WebsitePolicy
      */
     public function delete(User $user, Website $website): bool
     {
-        return $user->can('websites.delete');
+        return $user->can('websites.delete') && ! $website->isScanning();
     }
 
     /**

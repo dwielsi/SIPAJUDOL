@@ -37,17 +37,19 @@ class RolePermissionSeeder extends Seeder
             'monitoring.view',
             'spk.view',
             'notifications.view',
-            'keywords.viewAny',
-            'keywords.create',
-            'keywords.update',
-            'keywords.delete',
             'activity_logs.viewAny',
             'settings.manage',
+            'users.manage',
         ];
 
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
         }
+
+        // Permission yang baru saja dibuat di atas belum tentu masuk ke cache
+        // permission Spatie yang dipakai syncPermissions() di bawah, jadi
+        // cache-nya perlu dibersihkan lagi sebelum di-sync ke role.
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $kabid = Role::firstOrCreate(['name' => RoleEnum::Kabid->value, 'guard_name' => 'web']);
         $kabid->syncPermissions($permissions);

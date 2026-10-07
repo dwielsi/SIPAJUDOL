@@ -18,7 +18,7 @@ class ScanFindingSeeder extends Seeder
         ]);
 
         $this->seedFor('disdikbud.kuburayakab.go.id', [
-            ['category' => 'Komentar Pengunjung', 'severity' => 'low', 'message' => 'Kata kunci terkait konten ilegal muncul pada kolom komentar berita.', 'evidence' => 'Komentar pada artikel ID #482'],
+            ['category' => 'Komentar Pengunjung', 'severity' => 'low', 'message' => 'Konten ilegal terdeteksi oleh AI (LLM) pada kolom komentar berita.', 'evidence' => 'Komentar pada artikel ID #482'],
         ]);
     }
 

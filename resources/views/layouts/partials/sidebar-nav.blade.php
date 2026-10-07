@@ -24,12 +24,6 @@
             'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6M9 9h1"/></svg>',
         ],
         [
-            'route' => 'keywords.index',
-            'label' => 'Database Keyword',
-            'permission' => 'keywords.viewAny',
-            'icon' => '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7 7 10 10M7 17 17 7"/></svg>',
-        ],
-        [
             'route' => 'activity-logs.index',
             'label' => 'Activity Log',
             'permission' => 'activity_logs.viewAny',

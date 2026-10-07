@@ -30,7 +30,8 @@ Alpine.store('theme', {
     },
 
     apply() {
-        document.documentElement.classList.toggle('dark', this.dark);
+        const forceLight = document.documentElement.hasAttribute('data-force-light');
+        document.documentElement.classList.toggle('dark', this.dark && !forceLight);
     },
 });
 
@@ -41,6 +42,10 @@ Alpine.store('sidebar', {
         this.collapsed = !this.collapsed;
         localStorage.setItem('sidebar-collapsed', this.collapsed ? '1' : '0');
     },
+});
+
+Alpine.store('websiteTab', {
+    current: 'daftar',
 });
 
 Alpine.start();

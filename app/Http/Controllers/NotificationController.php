@@ -16,7 +16,17 @@ class NotificationController extends Controller
 
         $notifications = Notification::latest()->paginate(20);
 
-        return view('notifications.index', ['notifications' => $notifications]);
+        // Simpan halaman asal (bukan halaman notifikasi itu sendiri) agar tombol kembali tetap benar
+        // setelah berpindah halaman paginasi atau menandai semua dibaca.
+        $previous = url()->previous();
+        if (! str_starts_with($previous, route('notifications.index')) && str_starts_with($previous, url('/'))) {
+            session(['notifications.back' => $previous]);
+        }
+
+        return view('notifications.index', [
+            'notifications' => $notifications,
+            'backUrl' => session('notifications.back', route('dashboard')),
+        ]);
     }
 
     public function unread(): JsonResponse
@@ -33,7 +43,7 @@ class NotificationController extends Controller
                 'message' => $notification->message,
                 'icon' => $notification->typeIcon(),
                 'color' => $notification->typeColor(),
-                'created_at' => $notification->created_at->diffForHumans(),
+                'created_at' => $notification->created_at->translatedFormat('d M Y H:i'),
             ]),
         ]);
     }

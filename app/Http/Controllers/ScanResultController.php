@@ -30,15 +30,9 @@ class ScanResultController extends Controller
     {
         $website = Website::findOrFail($request->validated('website_id'));
 
-        $scanResult = ScanResult::create([
-            'website_id' => $website->id,
-            'scan_date' => now(),
-            'scan_state' => 'queued',
-        ]);
+        $scanResult = ScanWebsiteJob::start($website);
 
-        ScanWebsiteJob::dispatch($website, $scanResult);
-
-        return redirect()->route('scan-results.show', $scanResult)
+        return redirect()->route('scan-results.show', array_filter([$scanResult, 'from' => $request->input('from'), 'origin' => $request->input('origin')]))
             ->with('success', "Pemindaian {$website->website_name} telah dimulai.");
     }
 
@@ -46,23 +40,15 @@ class ScanResultController extends Controller
     {
         Gate::authorize('create', ScanResult::class);
 
-        $websites = Website::query()
-            ->with(['scanResults' => fn ($query) => $query->latest('scan_date')->limit(1)])
-            ->get()
-            ->reject(function (Website $website) {
-                $latest = $website->scanResults->first();
+        ScanResult::expireStale();
 
-                return $latest && in_array($latest->scan_state, ['queued', 'running'], true);
-            });
+        // Website yang masih punya scan aktif (belum macet) dilewati agar tidak dipindai ganda.
+        $websites = Website::query()
+            ->whereDoesntHave('scanResults', fn ($query) => $query->inProgress())
+            ->get();
 
         foreach ($websites as $website) {
-            $scanResult = ScanResult::create([
-                'website_id' => $website->id,
-                'scan_date' => now(),
-                'scan_state' => 'queued',
-            ]);
-
-            ScanWebsiteJob::dispatch($website, $scanResult);
+            ScanWebsiteJob::start($website);
         }
 
         $skipped = Website::count() - $websites->count();

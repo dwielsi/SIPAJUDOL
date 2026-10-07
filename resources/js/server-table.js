@@ -1,10 +1,10 @@
-export default function serverTable(endpoint, columns, filters = {}) {
+export default function serverTable(endpoint, columns, filters = {}, initialSearch = '') {
     return {
         rows: [],
         columns,
         filters,
         loading: true,
-        search: '',
+        search: initialSearch,
         page: 1,
         perPage: 10,
         total: 0,

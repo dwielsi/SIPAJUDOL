@@ -24,7 +24,8 @@ class MetaTagSpamDetector implements DetectorInterface
         foreach ($dom->metaTags() as $meta) {
             $content = strtolower($meta['content']);
 
-            if ($content === '') {
+            // Token acak (csrf, verifikasi) bisa kebetulan memuat kata seperti "judi".
+            if ($content === '' || preg_match('/token|verification|nonce/i', $meta['name'])) {
                 continue;
             }
 
@@ -42,7 +43,7 @@ class MetaTagSpamDetector implements DetectorInterface
                 }
             }
 
-            if (preg_match('/slot|gacor|casino|judi|maxwin|togel/i', $content)) {
+            if (preg_match('/\b(slot|gacor|casino|judi|maxwin|togel)/i', $content)) {
                 $findings[] = new Finding(
                     category: 'meta_tag_spam',
                     severity: 'high',

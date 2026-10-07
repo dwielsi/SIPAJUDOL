@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Website;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -14,6 +15,13 @@ class UpdateWebsiteRequest extends FormRequest
     public function authorize(): bool
     {
         return $this->user()->can('update', $this->route('website'));
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('domain')) {
+            $this->merge(['domain' => Website::normalizeDomain($this->input('domain'))]);
+        }
     }
 
     /**
@@ -36,8 +44,15 @@ class UpdateWebsiteRequest extends FormRequest
             'admin_name' => ['nullable', 'string', 'max:255'],
             'admin_email' => ['nullable', 'email', 'max:255'],
             'admin_phone' => ['nullable', 'string', 'max:30'],
-            'status' => ['required', Rule::in(['safe', 'needs_review', 'flagged'])],
+            'status' => ['required', Rule::in(['safe', 'needs_review', 'flagged', 'scan_failed'])],
             'notes' => ['nullable', 'string'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'domain.unique' => 'Domain ini sudah terdaftar.',
         ];
     }
 }

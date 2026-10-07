@@ -4,22 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreSettingRequest;
 use App\Models\Setting;
-use App\Services\MailSettingsService;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class SettingController extends Controller
 {
+    /**
+     * Halaman ini menggabungkan profil akun pribadi (bisa diakses semua
+     * pengguna yang login) dengan profil instansi (hanya untuk pengguna
+     * yang punya permission terkait). Tidak digerbangi Gate di level
+     * halaman supaya setiap pengguna tetap bisa mengelola profilnya
+     * sendiri; bagian instansi disembunyikan di view kalau tidak punya izin.
+     */
     public function edit(): View
     {
-        Gate::authorize('manage-settings');
+        $user = auth()->user();
+        $canManageSettings = $user->can('settings.manage');
 
         return view('settings.edit', [
-            'setting' => Setting::firstOrCreate(),
+            'user' => $user,
+            'canManageSettings' => $canManageSettings,
+            'setting' => $canManageSettings ? Setting::firstOrCreate() : null,
         ]);
     }
 
@@ -27,39 +32,8 @@ class SettingController extends Controller
     {
         $setting = Setting::firstOrCreate();
 
-        $data = $request->safe()->except('smtp_password');
-
-        if ($request->filled('smtp_password')) {
-            $data['smtp_password'] = (string) $request->input('smtp_password');
-        }
-
-        $setting->update($data);
+        $setting->update($request->validated());
 
         return redirect()->route('settings.edit')->with('success', 'Pengaturan berhasil disimpan.');
-    }
-
-    public function testEmail(Request $request): JsonResponse
-    {
-        Gate::authorize('manage-settings');
-
-        $request->validate([
-            'email' => ['required', 'email'],
-        ]);
-
-        app(MailSettingsService::class)->apply();
-
-        try {
-            Mail::raw(
-                "Ini adalah email uji coba konfigurasi SMTP dari {$request->user()->name} melalui SIDEPSIL.",
-                function ($message) use ($request) {
-                    $message->to($request->input('email'))
-                        ->subject('Uji Coba Konfigurasi SMTP - SIDEPSIL');
-                }
-            );
-
-            return response()->json(['success' => true, 'message' => 'Email uji coba berhasil dikirim.']);
-        } catch (\Throwable $e) {
-            return response()->json(['success' => false, 'message' => 'Gagal mengirim email: '.$e->getMessage()], 422);
-        }
     }
 }

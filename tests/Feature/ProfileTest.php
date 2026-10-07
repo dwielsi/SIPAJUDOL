@@ -10,15 +10,33 @@ class ProfileTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_profile_page_is_displayed(): void
+    public function test_profile_url_redirects_to_the_settings_page(): void
     {
         $user = User::factory()->create();
 
-        $response = $this
-            ->actingAs($user)
-            ->get('/profile');
+        $response = $this->actingAs($user)->get('/profile');
+
+        $response->assertRedirect('/settings');
+    }
+
+    public function test_any_authenticated_user_can_see_their_own_profile_on_the_settings_page(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/settings');
 
         $response->assertOk();
+        $response->assertSee('Informasi Profil');
+    }
+
+    public function test_the_settings_page_no_longer_offers_self_service_password_change(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/settings');
+
+        $response->assertOk();
+        $response->assertDontSee('Ubah Password');
     }
 
     public function test_profile_information_can_be_updated(): void
@@ -34,7 +52,7 @@ class ProfileTest extends TestCase
 
         $response
             ->assertSessionHasNoErrors()
-            ->assertRedirect('/profile');
+            ->assertRedirect('/settings');
 
         $user->refresh();
 
@@ -56,44 +74,33 @@ class ProfileTest extends TestCase
 
         $response
             ->assertSessionHasNoErrors()
-            ->assertRedirect('/profile');
+            ->assertRedirect('/settings');
 
         $this->assertNotNull($user->refresh()->email_verified_at);
     }
 
-    public function test_user_can_delete_their_account(): void
+    public function test_the_settings_page_no_longer_offers_self_service_account_deletion(): void
     {
         $user = User::factory()->create();
 
-        $response = $this
-            ->actingAs($user)
-            ->delete('/profile', [
-                'password' => 'password',
-            ]);
+        $response = $this->actingAs($user)->get('/settings');
 
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect('/');
-
-        $this->assertGuest();
-        $this->assertNull($user->fresh());
+        $response->assertOk();
+        $response->assertDontSee('Hapus Akun');
     }
 
-    public function test_correct_password_must_be_provided_to_delete_account(): void
+    public function test_the_self_service_delete_account_route_no_longer_exists(): void
     {
         $user = User::factory()->create();
 
-        $response = $this
-            ->actingAs($user)
-            ->from('/profile')
-            ->delete('/profile', [
-                'password' => 'wrong-password',
-            ]);
+        // DELETE /profile tidak lagi terhubung ke aksi hapus akun apa pun
+        // (jatuh ke redirect umum bekas URL lama /profile), jadi akun tidak
+        // pernah terhapus lewat rute ini.
+        $response = $this->actingAs($user)->delete('/profile', [
+            'password' => 'password',
+        ]);
 
-        $response
-            ->assertSessionHasErrorsIn('userDeletion', 'password')
-            ->assertRedirect('/profile');
-
+        $response->assertRedirect('/settings');
         $this->assertNotNull($user->fresh());
     }
 }

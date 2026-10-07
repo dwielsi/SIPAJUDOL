@@ -1,0 +1,242 @@
+<mxfile host="app.diagrams.net" agent="Claude Code" version="24.0.0">
+  <diagram id="sidepsil-activity" name="Activity Diagram - SIDEPSIL">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="2250" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Pool background -->
+        <mxCell id="pool" value="Alur Aktivitas: Deteksi Konten Ilegal pada Website (SIDEPSIL) - tanpa fitur SPK" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=center;fontStyle=1;fontSize=16;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="20" y="20" width="1040" height="2180" as="geometry" />
+        </mxCell>
+
+        <!-- Lane backgrounds -->
+        <mxCell id="laneP" value="Pengguna" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=center;fontStyle=1;fontSize=14;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="40" y="70" width="300" height="2100" as="geometry" />
+        </mxCell>
+        <mxCell id="laneS" value="Sistem (Controller Aplikasi)" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=center;fontStyle=1;fontSize=14;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="340" y="70" width="320" height="2100" as="geometry" />
+        </mxCell>
+        <mxCell id="laneW" value="Queue Worker (ScanWebsiteJob)" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=center;fontStyle=1;fontSize=14;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="660" y="70" width="380" height="2100" as="geometry" />
+        </mxCell>
+
+        <!-- Nodes -->
+        <mxCell id="start1" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="170" y="90" width="40" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actP1" value="Isi form tambah website, atau pilih aksi Scan / Scan All pada website yang ada" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="170" width="260" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actS1" value="Validasi input dan simpan data Website (jika baru)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="360" y="170" width="280" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="decScanAll" value="Mode Scan All: website ini sedang diproses (queued/running) dan belum melewati batas waktu 420 detik?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="370" y="270" width="260" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="endSkip" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="620" y="305" width="30" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actS2" value="Buat ScanResult baru (scan_state = 'queued', scan_date = now())" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="360" y="400" width="280" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actS3" value="Dispatch ScanWebsiteJob ke antrian (queue)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="360" y="490" width="280" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actS4" value="Redirect ke halaman detail scan (tampilkan status 'queued')" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="360" y="580" width="280" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actP2" value="Memantau progres scan secara realtime (polling status)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="580" width="260" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actW1" value="Update scan_state = 'running', progress_percent = 5%" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="680" y="490" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actW2" value="Crawl seluruh halaman pada domain website" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="680" y="580" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="decCrawl" value="Domain berhasil diakses / di-crawl?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="690" y="670" width="320" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actWfail1" value="Scan gagal: set scan_state = 'failed', catat current_step (pesan error), completed_at = now()" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="920" y="790" width="110" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actWfail2" value="Kirim notifikasi 'Scan Gagal'" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="920" y="910" width="110" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actW3" value="Ambil screenshot homepage (progress ~72%)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#ffffff;strokeColor=#333333;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="680" y="790" width="230" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="decScreenshot" value="Screenshot berhasil diambil?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="685" y="880" width="220" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actW3a" value="Simpan screenshot_path" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#ffffff;strokeColor=#333333;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="680" y="990" width="100" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actW3b" value="screenshot_path = null (proses tetap lanjut)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#ffffff;strokeColor=#333333;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="790" y="990" width="110" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actW4" value="Jalankan detector per halaman (keyword judol, iframe, obfuscation, malware, redirect, seo spam, dll) dan site-probe (backdoor, php shell, defacement); simpan tiap temuan sebagai ScanFinding" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#ffffff;strokeColor=#333333;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="680" y="1090" width="340" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actW5" value="Hitung risk_score dan tentukan status hasil (safe / needs_review / flagged) via RiskScoringService" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#ffffff;strokeColor=#333333;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="680" y="1200" width="340" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actW6" value="Panggil AiAnalysisService untuk ringkasan dan rekomendasi AI" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="680" y="1300" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actW7" value="Cek SSL certificate domain" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="680" y="1380" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actW8" value="Update ScanResult (status, risk_score, scan_state = 'completed', progress_percent = 100%, completed_at) dan Update Website (status, last_scanned_at, ssl_valid, dll)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#ffffff;strokeColor=#333333;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="680" y="1460" width="340" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="decThreat" value="Status hasil = 'flagged' atau 'needs_review'?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="690" y="1570" width="320" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actW9" value="Kirim notifikasi tambahan: peringatan ancaman terdeteksi" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="680" y="1690" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actW10" value="Kirim notifikasi 'Scan Selesai'" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="680" y="1780" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actP3" value="Lihat hasil scan: status akhir, skor risiko, screenshot, daftar temuan, ringkasan AI" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1880" width="260" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="actP4" value="Lihat Dashboard: agregat status website, scan berjalan, top website berisiko, aktivitas dan notifikasi terbaru" style="rounded=1;whiteSpace=wrap;html=1;arcSize=25;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1990" width="260" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="end1" value="" style="ellipse;shape=doubleEllipse;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="170" y="2110" width="40" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Edges -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="start1" target="actP1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actP1" target="actS1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actS1" target="decScanAll">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" value="Ya (lewati, hindari duplikasi)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="decScanAll" target="endSkip">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" value="Tidak" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="decScanAll" target="actS2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actS2" target="actS3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actS3" target="actS4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" value="job diproses async oleh worker" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;fontSize=10;" edge="1" parent="1" source="actS3" target="actW1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actS4" target="actP2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actW1" target="actW2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actW2" target="decCrawl">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" value="Tidak" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="decCrawl" target="actWfail1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actWfail1" target="actWfail2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actWfail2" target="actP3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e15" value="Ya" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="decCrawl" target="actW3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actW3" target="decScreenshot">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e17" value="Ya" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="decScreenshot" target="actW3a">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e18" value="Tidak" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="decScreenshot" target="actW3b">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actW3a" target="actW4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actW3b" target="actW4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actW4" target="actW5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actW5" target="actW6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actW6" target="actW7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actW7" target="actW8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actW8" target="decThreat">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e26" value="Ya" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="decThreat" target="actW9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e27" value="Tidak" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;fontSize=10;" edge="1" parent="1" source="decThreat" target="actW10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actW9" target="actW10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actW10" target="actP3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;dashed=1;" edge="1" parent="1" source="actP2" target="actP3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actP3" target="actP4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="actP4" target="end1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

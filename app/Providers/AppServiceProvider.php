@@ -3,14 +3,12 @@
 namespace App\Providers;
 
 use App\Models\ActivityLog;
-use App\Models\Keyword;
 use App\Models\Report;
 use App\Models\ScanResult;
 use App\Models\Website;
 use App\Observers\ReportObserver;
 use App\Observers\ScanResultObserver;
 use App\Observers\WebsiteObserver;
-use App\Policies\KeywordPolicy;
 use App\Policies\ReportPolicy;
 use App\Policies\ScanResultPolicy;
 use App\Policies\WebsitePolicy;
@@ -19,9 +17,14 @@ use App\Repositories\Contracts\WebsiteRepositoryInterface;
 use App\Repositories\ReportRepository;
 use App\Repositories\WebsiteRepository;
 use App\Services\MailSettingsService;
+use App\Services\Llm\SumopodClient;
+use App\Services\QueueWorkerService;
 use App\Services\Scanner\ScreenshotService;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
+use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Events\Looping;
+use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -37,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ReportRepositoryInterface::class, ReportRepository::class);
 
         $this->app->singleton(ScreenshotService::class, fn () => new ScreenshotService(config('scanner.screenshot')));
+        $this->app->singleton(SumopodClient::class, fn () => new SumopodClient(config('services.sumopod')));
     }
 
     /**
@@ -47,7 +51,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Website::class, WebsitePolicy::class);
         Gate::policy(Report::class, ReportPolicy::class);
         Gate::policy(ScanResult::class, ScanResultPolicy::class);
-        Gate::policy(Keyword::class, KeywordPolicy::class);
 
         Gate::define('manage-settings', fn ($user) => $user->can('settings.manage'));
 
@@ -56,6 +59,9 @@ class AppServiceProvider extends ServiceProvider
         Website::observe(WebsiteObserver::class);
         Report::observe(ReportObserver::class);
         ScanResult::observe(ScanResultObserver::class);
+
+        Event::listen([Looping::class, JobProcessing::class], fn () => $this->app->make(QueueWorkerService::class)->beat());
+        Event::listen(WorkerStopping::class, fn () => $this->app->make(QueueWorkerService::class)->stopped());
 
         Event::listen(function (Login $event) {
             ActivityLog::create([

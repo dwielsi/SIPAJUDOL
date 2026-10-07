@@ -31,19 +31,29 @@ class ReportController extends Controller
         Gate::authorize('viewAny', Report::class);
 
         if ($request->ajax()) {
-            return $dataTable->ajax();
+            return $dataTable->ajax($request);
         }
 
-        return view('reports.index');
+        $resultCounts = collect(ReportDataTable::RESULTS)->map(fn (string $label, string $status) => [
+            'label' => $label,
+            'count' => Report::whereHas('scanResult', fn ($scan) => $scan->where('status', $status))->count(),
+        ]);
+
+        return view('reports.index', [
+            'resultCounts' => $resultCounts,
+            'totalReports' => Report::count(),
+        ]);
     }
 
     public function create(Request $request): View
     {
         Gate::authorize('create', Report::class);
 
+        $selectedScanResultId = $request->integer('scan_result_id') ?: null;
+
         return view('reports.create', [
-            'scanResults' => $this->scanResultOptions(),
-            'selectedScanResultId' => $request->integer('scan_result_id') ?: null,
+            'scanResults' => $this->scanResultOptions($selectedScanResultId),
+            'selectedScanResultId' => $selectedScanResultId,
         ]);
     }
 
@@ -51,7 +61,7 @@ class ReportController extends Controller
     {
         $report = $this->reports->create($request->validated());
 
-        return redirect()->route('reports.show', $report)->with('success', 'Laporan berhasil dibuat.');
+        return redirect()->route('reports.show', [$report, ...$this->backQuery($request)])->with('success', 'Laporan berhasil dibuat.');
     }
 
     public function show(Report $report): View
@@ -77,7 +87,7 @@ class ReportController extends Controller
     {
         $this->reports->update($report, $request->validated());
 
-        return redirect()->route('reports.show', $report)->with('success', 'Laporan berhasil diperbarui.');
+        return redirect()->route('reports.show', [$report, ...$this->backQuery($request)])->with('success', 'Laporan berhasil diperbarui.');
     }
 
     public function destroy(Report $report): RedirectResponse
@@ -121,7 +131,7 @@ class ReportController extends Controller
         try {
             Mail::to($request->input('email'))->send(new ReportMail($report, $request->input('note')));
         } catch (\Throwable $e) {
-            return redirect()->route('reports.show', $report)
+            return redirect()->route('reports.show', [$report, ...$this->backQuery($request)])
                 ->with('error', 'Gagal mengirim laporan: '.$e->getMessage());
         }
 
@@ -139,21 +149,32 @@ class ReportController extends Controller
             'ip_address' => $request->ip(),
         ]);
 
-        return redirect()->route('reports.show', $report)
+        return redirect()->route('reports.show', [$report, ...$this->backQuery($request)])
             ->with('success', 'Laporan berhasil dikirim ke '.$request->input('email').'.');
+    }
+
+    /**
+     * Asal halaman (detail website / monitoring) agar tombol kembali pada detail laporan tetap sesuai.
+     */
+    private function backQuery(Request $request): array
+    {
+        return array_filter([
+            'from' => $request->query('from') === 'website' ? 'website' : null,
+            'origin' => $request->query('origin') === 'monitoring' ? 'monitoring' : null,
+        ]);
     }
 
     private function scanResultOptions(?int $includeScanResultId = null)
     {
         $scanResults = ScanResult::query()
-            ->with('website')
+            ->with(['website', 'findings'])
             ->latest('scan_date')
             ->get()
             ->unique('website_id')
             ->values();
 
         if ($includeScanResultId && $scanResults->doesntContain('id', $includeScanResultId)) {
-            $current = ScanResult::query()->with('website')->find($includeScanResultId);
+            $current = ScanResult::query()->with(['website', 'findings'])->find($includeScanResultId);
 
             if ($current) {
                 $scanResults->push($current);

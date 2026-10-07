@@ -12,6 +12,8 @@ class ScanResultDataTable
 {
     public function query(Request $request): Builder
     {
+        ScanResult::expireStale();
+
         return ScanResult::query()
             ->with('website')
             ->latest('scan_date')
@@ -28,6 +30,12 @@ class ScanResultDataTable
         return DataTables::eloquent($this->query($request))
             ->addColumn('website_name', fn (ScanResult $scanResult) => $scanResult->website?->website_name ?? '—')
             ->addColumn('domain', fn (ScanResult $scanResult) => $scanResult->website?->domain ?? '—')
+            ->filterColumn('website_name', function (Builder $query, string $keyword) {
+                $query->whereHas('website', fn (Builder $q) => $q->where('website_name', 'like', "%{$keyword}%"));
+            })
+            ->filterColumn('domain', function (Builder $query, string $keyword) {
+                $query->whereHas('website', fn (Builder $q) => $q->where('domain', 'like', "%{$keyword}%"));
+            })
             ->addColumn('scan_date_label', fn (ScanResult $scanResult) => $scanResult->scan_date->translatedFormat('d M Y'))
             ->addColumn('badge', fn (ScanResult $scanResult) => [
                 'color' => $scanResult->riskLevelColor(),

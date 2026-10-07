@@ -9,7 +9,14 @@
     </x-slot>
 
     <div x-data="{
-            ...serverTable('{{ route('reports.index') }}', ['report_number', 'website_name', 'report_date_label', 'analyst', 'status_badge', 'actions']),
+            ...serverTable('{{ route('reports.index') }}', ['report_number', 'website_name', 'report_date_label', 'analyst', 'result_badge', 'status_badge', 'actions']),
+            result: '',
+            setResult(result) {
+                this.result = result;
+                this.filters = result ? { result } : {};
+                this.page = 1;
+                this.fetchRows();
+            },
             async destroy(row) {
                 const result = await Swal.fire({
                     title: 'Hapus laporan ini?',
@@ -43,12 +50,42 @@
          }"
          class="space-y-4">
 
+        @php
+            $resultStyles = [
+                'flagged' => ['dot' => 'bg-danger-500', 'active' => 'border-danger-300 bg-danger-50 dark:border-danger-500/40 dark:bg-danger-500/10'],
+                'needs_review' => ['dot' => 'bg-warning-500', 'active' => 'border-warning-300 bg-warning-50 dark:border-warning-500/40 dark:bg-warning-500/10'],
+                'safe' => ['dot' => 'bg-success-500', 'active' => 'border-success-300 bg-success-50 dark:border-success-500/40 dark:bg-success-500/10'],
+            ];
+            $inactiveStyle = 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900';
+        @endphp
+
+        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <button type="button" @click="setResult('')"
+                    :class="result === '' ? 'border-primary-300 bg-primary-50 dark:border-primary-500/40 dark:bg-primary-500/10' : '{{ $inactiveStyle }}'"
+                    class="rounded-2xl border p-4 text-left transition">
+                <span class="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                    <span class="h-2 w-2 rounded-full bg-primary-500"></span> Semua Laporan
+                </span>
+                <span class="mt-1 block font-heading text-2xl font-semibold text-slate-900 dark:text-white">{{ $totalReports }}</span>
+            </button>
+            @foreach ($resultCounts as $status => $result)
+                <button type="button" @click="setResult('{{ $status }}')"
+                        :class="result === '{{ $status }}' ? '{{ $resultStyles[$status]['active'] }}' : '{{ $inactiveStyle }}'"
+                        class="rounded-2xl border p-4 text-left transition">
+                    <span class="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                        <span class="h-2 w-2 rounded-full {{ $resultStyles[$status]['dot'] }}"></span> {{ $result['label'] }}
+                    </span>
+                    <span class="mt-1 block font-heading text-2xl font-semibold text-slate-900 dark:text-white">{{ $result['count'] }}</span>
+                </button>
+            @endforeach
+        </div>
+
         <x-card :padding="false">
             <div class="flex flex-col gap-3 border-b border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800">
                 <div class="relative w-full sm:max-w-xs">
                     <svg xmlns="http://www.w3.org/2000/svg" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                     <input type="text" x-model="search" placeholder="Cari nomor laporan, website, atau analis..."
-                           class="w-full rounded-lg border-slate-300 pl-9 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500">
+                           class="w-full rounded-xl border-0 bg-slate-100 pl-9 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/40 dark:bg-slate-900/60 dark:text-slate-200 dark:placeholder-slate-500">
                 </div>
 
                 @can('create', \App\Models\Report::class)
@@ -67,6 +104,7 @@
                             <th class="px-4 py-3">Website</th>
                             <th class="px-4 py-3">Tanggal</th>
                             <th class="px-4 py-3">Analis</th>
+                            <th class="px-4 py-3">Hasil Pemeriksaan</th>
                             <th class="px-4 py-3">Status</th>
                             <th class="px-4 py-3 text-right">Aksi</th>
                         </tr>
@@ -79,6 +117,7 @@
                                     <td class="px-4 py-4"><div class="h-3 w-36 rounded bg-slate-200 dark:bg-slate-700"></div></td>
                                     <td class="px-4 py-4"><div class="h-3 w-24 rounded bg-slate-200 dark:bg-slate-700"></div></td>
                                     <td class="px-4 py-4"><div class="h-3 w-28 rounded bg-slate-200 dark:bg-slate-700"></div></td>
+                                    <td class="px-4 py-4"><div class="h-5 w-24 rounded-full bg-slate-200 dark:bg-slate-700"></div></td>
                                     <td class="px-4 py-4"><div class="h-5 w-20 rounded-full bg-slate-200 dark:bg-slate-700"></div></td>
                                     <td class="px-4 py-4"><div class="ml-auto h-3 w-16 rounded bg-slate-200 dark:bg-slate-700"></div></td>
                                 </tr>
@@ -87,7 +126,7 @@
 
                         <template x-if="!loading && rows.length === 0">
                             <tr>
-                                <td colspan="6">
+                                <td colspan="7">
                                     <x-empty-state title="Belum ada laporan" description="Buat laporan pertama dari hasil pemindaian website." />
                                 </td>
                             </tr>
@@ -100,6 +139,24 @@
                                 <td class="px-4 py-3.5 text-slate-500 dark:text-slate-400" x-text="row.website_name"></td>
                                 <td class="px-4 py-3.5 text-slate-500 dark:text-slate-400" x-text="row.report_date_label"></td>
                                 <td class="px-4 py-3.5 text-slate-500 dark:text-slate-400" x-text="row.analyst"></td>
+                                <td class="px-4 py-3.5">
+                                    <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium"
+                                          :class="{
+                                              'bg-danger-50 text-danger-700 dark:bg-danger-500/10 dark:text-danger-500': row.result_badge.color === 'danger',
+                                              'bg-warning-50 text-warning-700 dark:bg-warning-500/10 dark:text-warning-500': row.result_badge.color === 'warning',
+                                              'bg-success-50 text-success-700 dark:bg-success-500/10 dark:text-success-500': row.result_badge.color === 'success',
+                                              'bg-slate-100 text-slate-600 dark:bg-slate-700/50 dark:text-slate-300': row.result_badge.color === 'slate',
+                                          }">
+                                        <span class="h-1.5 w-1.5 rounded-full"
+                                              :class="{
+                                                  'bg-danger-500': row.result_badge.color === 'danger',
+                                                  'bg-warning-500': row.result_badge.color === 'warning',
+                                                  'bg-success-500': row.result_badge.color === 'success',
+                                                  'bg-slate-400': row.result_badge.color === 'slate',
+                                              }"></span>
+                                        <span x-text="row.result_badge.label"></span>
+                                    </span>
+                                </td>
                                 <td class="px-4 py-3.5">
                                     <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium"
                                           :class="{

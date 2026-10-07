@@ -5,6 +5,11 @@ return [
     'max_pages' => env('SCANNER_MAX_PAGES', 15),
     'max_depth' => env('SCANNER_MAX_DEPTH', 2),
     'timeout' => env('SCANNER_TIMEOUT', 10),
+    // Pemulihan otomatis berbantuan AI saat website gagal diakses.
+    'recovery' => [
+        'max_attempts' => env('SCANNER_RECOVERY_MAX_ATTEMPTS', 8),
+        'time_budget' => env('SCANNER_RECOVERY_TIME_BUDGET', 300),
+    ],
     'user_agent' => 'SIDEPSIL-Scanner/1.0 (+Diskominfo Kubu Raya Security Monitoring)',
 
     'screenshot' => [
